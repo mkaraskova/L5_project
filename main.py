@@ -1,6 +1,8 @@
 import cv2
 import logging
 from fer import FER
+import matplotlib.pyplot as plt
+from statistics import mean
 
 
 def detect_emotion():
@@ -9,6 +11,7 @@ def detect_emotion():
 
     frame_no = 0
     emotion_text = None
+    emotions = {}
     while True:
         frame_no += 1
         ret, frame = webcam.read()
@@ -22,8 +25,13 @@ def detect_emotion():
                 (top, right, bottom, left) = face["box"]
                 emotion = max(face["emotions"], key=face["emotions"].get)
                 score = face["emotions"][emotion]
-
                 emotion_text = f'{emotion}: {score:.2f}'
+
+                # track emotions
+                if emotion not in emotions:
+                    emotions[emotion] = [score]
+                else:
+                    emotions[emotion].append(score)
 
         if emotion_text:
             textbox, baseline = cv2.getTextSize(emotion_text, cv2.FONT_HERSHEY_SIMPLEX, 0.9, 2)
@@ -38,6 +46,30 @@ def detect_emotion():
 
     webcam.release()
     cv2.destroyAllWindows()
+
+    emotion_names = emotions.keys()
+    emotion_frequencies = [len(values) for values in emotions.values()]
+    emotion_averages = [mean(values) for values in emotions.values()]
+
+    fig, axs = plt.subplots(2)
+
+    # Plot emotion frequencies
+    axs[0].bar(emotion_names, emotion_frequencies, color='r')
+    axs[0].set_title('Emotion Frequencies')
+    axs[0].set_ylabel('Frequencies')
+
+    # Plot average intensities
+    axs[1].bar(emotion_names, emotion_averages, color='b')
+    axs[1].set_title('Average Intensities')
+    axs[1].set_ylabel('Average Intensity')
+
+    # Set common x-axis properties
+    for ax in axs:
+        ax.set_xticks(range(len(emotion_names)))
+        ax.set_xticklabels(emotion_names, rotation=45)
+
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == '__main__':
