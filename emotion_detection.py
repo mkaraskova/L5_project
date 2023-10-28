@@ -1,13 +1,11 @@
 import cv2
 import logging
 from fer import FER
-import matplotlib.pyplot as plt
-from statistics import mean
 
 
 def detect_emotion():
-    detector = FER(mtcnn=False)  # initialize with MTCNN network
-    webcam = cv2.VideoCapture(1)  # open 2nd webcam
+    detector = FER(mtcnn=False)
+    webcam = cv2.VideoCapture(0)
 
     frame_no = 0
     emotion_text = None
@@ -46,33 +44,5 @@ def detect_emotion():
 
     webcam.release()
     cv2.destroyAllWindows()
-
-    emotion_names = emotions.keys()
-    emotion_frequencies = [len(values) for values in emotions.values()]
-    emotion_averages = [mean(values) for values in emotions.values()]
-
-    fig, axs = plt.subplots(2)
-
-    # Plot emotion frequencies
-    axs[0].bar(emotion_names, emotion_frequencies, color='r')
-    axs[0].set_title('Emotion Frequencies')
-    axs[0].set_ylabel('Frequencies')
-
-    # Plot average intensities
-    axs[1].bar(emotion_names, emotion_averages, color='b')
-    axs[1].set_title('Average Intensities')
-    axs[1].set_ylabel('Average Intensity')
-
-    # Set common x-axis properties
-    for ax in axs:
-        ax.set_xticks(range(len(emotion_names)))
-        ax.set_xticklabels(emotion_names, rotation=45)
-
-    plt.tight_layout()
-    plt.show()
-
-
-if __name__ == '__main__':
-    detect_emotion()
 
 
