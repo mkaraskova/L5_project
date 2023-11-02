@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user
@@ -43,9 +45,17 @@ def register():
         return render_template('register.html')
 
     hashed_pwd = generate_password_hash(request.form['password'], method='sha256')
+
+    # Convert birth date from 'dd-mm-yyyy' to a date object
+    birth_day = datetime.strptime(request.form['birth_day'], '%Y-%m-%d').date()
+
     new_user = {
         "_id": request.form['email'],
-        "password": hashed_pwd
+        "password": hashed_pwd,
+        "first_name": request.form['first_name'],
+        "last_name": request.form['last_name'],
+        "birth_day": birth_day,  # Use the converted birth_day
+        "gender": request.form['gender']
     }
 
     # Insert the new user into database

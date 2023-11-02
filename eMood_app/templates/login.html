@@ -1,16 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Login</title>
+  <title>Login Page</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-  <h2>Login</h2>
-  <form method="post">
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br>
-    <input type="submit" value="Login">
-  </form>
+  {% extends "base.html" %}
+  {% block content %}
+  <div class="login-container">
+      <div class="login-image-container">
+        <img src="/static/images/background.jpg" alt="Image description" class="form-image">
+      </div>
+      <div class="login-form-content">
+        <img src="/static/images/logo.png" alt="Logo" id="formLogo">
+
+        <form id="loginForm">
+          <div class="login-input-field">
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+          </div>
+          <div class="login-input-field">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+          <div class="login-submit-button">
+            <input type="submit" value="Submit">
+          </div>
+        </form>
+
+        <p id="result"></p>
+      </div>
+  </div>
+  <script src="/static/login.js"></script>
+  {% endblock %}
 </body>
 </html>

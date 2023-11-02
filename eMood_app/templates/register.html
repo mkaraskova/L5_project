@@ -1,16 +1,67 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Register</title>
+  <title>Register Page</title>
+  <link rel="stylesheet" href="/static/styles.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
-  <h2>Register</h2>
-  <form method="post">
-    <label for="email">Email:</label><br>
-    <input type="email" id="email" name="email" required><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password" required><br>
-    <input type="submit" value="Register">
-  </form>
+{% extends "base.html" %}
+  {% block content %}
+  <div class="register-container">
+    <div class="register-image-container">
+      <img src="/static/images/background.jpg" alt="Image description" class="form-image">
+    </div>
+
+    <div class="register-form-content">
+      <img src="/static/images/logo.png" alt="Logo" id="formLogo">
+      <form id="registerForm">
+        <!-- Add First Name with Placeholder -->
+        <div class="register-input-field">
+          <input type="text" id="first_name" name="first_name" placeholder="First Name" required>
+        </div>
+
+        <!-- Add Last Name with Placeholder -->
+        <div class="register-input-field">
+          <input type="text" id="last_name" name="last_name" placeholder="Last Name" required>
+        </div>
+
+        <!-- Add Gender and Birth Day with Placeholders -->
+        <div class="combined-input-field">
+            <div class="register-input-field">
+              <label for="gender">Gender:</label>
+              <select id="gender" name="gender" required>
+                <option value="">Select...</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="register-input-field">
+              <label for="birth_day">Birthday:</label>
+              <input type="date" id="birth_day" name="birth_day" required>
+            </div>
+        </div>
+
+        <div class="register-input-field">
+          <input type="email" id="email" name="email" placeholder="Email">
+        </div>
+
+        <div class="register-input-field">
+          <input type="password" id="password" name="password" placeholder="Password" required>
+        </div>
+
+        <div class="register-submit-button">
+          <input type="submit" value="Submit">
+        </div>
+      </form>
+
+      <p id="result"></p>
+    </div>
+  </div>
+
+<script src="/static/register.js"></script>
+{% endblock %}
 </body>
 </html>

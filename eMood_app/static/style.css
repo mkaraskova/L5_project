@@ -1,0 +1,205 @@
+* {
+  box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 10vh;
+    background-color: #FFFFFF;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    z-index: 100;
+}
+nav ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    margin-left: auto;
+
+}
+nav ul li {
+    float: right;
+    padding: 0;
+    margin: 0;
+    display: inline-block;
+    line-height: 0;
+    padding-right: 2rem;
+}
+nav ul li a {
+    display: block;
+    color: black;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    line-height: 10vh;
+    font-size: 20px;
+    font-family: Arial, sans-serif;
+}
+nav ul li a:hover {
+    color: grey;
+    background-color: inherit;
+}
+#logo {
+    display: block;
+    float: left;
+    height: 14vh;  /* Change this to adjust the height */
+    width: auto;  /* maintain aspect ratio */
+    margin-right: 1px;
+    line-height: 10vh;
+    vertical-align: top;
+}
+body {
+    background-color: #AD9075;
+    font-family: Arial, sans-serif;
+}
+html {
+  padding: 0;
+  margin: 0;
+}
+.login-container {
+  display: flex;
+}
+
+.login-image-container {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.login-image-container img {
+  max-width: 110%;
+}
+
+.login-form-content {
+  margin: 20px auto;
+  flex: 1;
+  padding: 4em;
+  padding-left: 15%;
+  font-size: 1.2em;
+}
+
+#loginForm input[type="email"],
+#loginForm input[type="password"]{
+    flex: 3;
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 1em;
+}
+
+.login-input-field {
+  display: flex;
+  justify-content: start;
+  align-items: center;
+}
+
+.login-input-field label {
+  flex: 1;
+  margin-right: 0.5em;
+}
+
+.login-input-field input[type="email"],
+.login-input-field input[type="password"] {
+  flex: 2;
+}
+
+.login-submit-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#loginForm input[type="submit"] {
+    width: 50%;
+    height: 30px;
+    border-radius: 20px;
+    font-size: 1em;
+}
+#formLogo {
+    display: block;
+    height: 35vh;
+    width: auto;
+    margin: 1px auto;
+}
+
+.register-container {
+  display: flex;
+}
+
+.register-image-container {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+
+.register-form-content {
+  margin: 20px auto;
+  flex: 1;
+  padding: 4em;
+  padding-left: 15%;
+  font-size: 1.2em;
+}
+
+.register-image-container img {
+  max-width: 110%; /* This will make image resize according to its container size */
+}
+
+#registerForm input{
+    flex: 3;
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 1em;
+}
+
+.combined-input-field .register-input-field {
+  flex-direction: column;
+}
+
+.combined-input-field .register-input-field label {
+  font-size: 0.7em;  /* Adjust size as needed */
+  margin-bottom: 0em;  /* Add some space between the label and the input */
+}
+.register-input-field input {
+  flex: 2;
+}
+
+.register-submit-button {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+#registerForm input[type="submit"], #loginForm input[type="submit"] {
+    width: 30%;
+    flex: 0 1 auto;
+    border-radius: 50px;
+}
+#registerForm select{
+    flex: 3;
+    width: 100%;
+    height: 40px;
+    padding: 10px;
+    margin-top: 10px;
+    font-size: 1em;
+}
+#result {
+    margin-top: 10px;
+    text-align: center;
+}
+.combined-input-field {
+  display: flex;
+  justify-content: space-between;
+}
+
+.combined-input-field .register-input-field {
+  flex: 1;
+}
