@@ -46,3 +46,7 @@ def detect_emotion():
     cv2.destroyAllWindows()
 
 
+if __name__ == '__main__':
+    detect_emotion()
+
+

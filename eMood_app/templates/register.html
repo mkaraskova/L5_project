@@ -1,67 +1,70 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Register Page</title>
-  <link rel="stylesheet" href="/static/styles.css">
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <title>Register Page</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
-<body>
-{% extends "base.html" %}
-  {% block content %}
-  <div class="register-container">
-    <div class="register-image-container">
-      <img src="/static/images/background.jpg" alt="Image description" class="form-image">
-    </div>
+<body class="no-scroll">
+{% block content %}
+<div class="container">
+    <section class="vh-100">
+        <div class="container-fluid h-custom">
+            <div class="row d-flex justify-content-center align-items-center h-100">
+                <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
+                    <div class="col-12 text-center">
+                        <img src="/static/images/logo.png" class="img-fluid login-logo" alt="Logo">
+                    </div>
 
-    <div class="register-form-content">
-      <img src="/static/images/logo.png" alt="Logo" id="formLogo">
-      <form id="registerForm">
-        <!-- Add First Name with Placeholder -->
-        <div class="register-input-field">
-          <input type="text" id="first_name" name="first_name" placeholder="First Name" required>
-        </div>
+                    <form id="loginForm">
+                        <!-- Email input -->
+                        <div class="form-outline mb-3">
+                            <input type="email" id="form3Example3" name="email" class="form-control form-control-lg"
+                                   placeholder="Enter a valid email address" required/>
+                        </div>
 
-        <!-- Add Last Name with Placeholder -->
-        <div class="register-input-field">
-          <input type="text" id="last_name" name="last_name" placeholder="Last Name" required>
-        </div>
+                        <!-- Password input -->
+                        <div class="form-outline mb-3">
+                            <input type="password" id="form3Example4" name="password" class="form-control form-control-lg"
+                                   placeholder="Enter password" required/>
+                        </div>
 
-        <!-- Add Gender and Birth Day with Placeholders -->
-        <div class="combined-input-field">
-            <div class="register-input-field">
-              <label for="gender">Gender:</label>
-              <select id="gender" name="gender" required>
-                <option value="">Select...</option>
-                <option value="male">Male</option>
-                <option value="female">Female</option>
-                <option value="other">Other</option>
-              </select>
+                        <!-- Confirm Password input -->
+                        <div class="form-outline mb-3">
+                            <input type="password" id="form3Example5" name="confirm_password" class="form-control form-control-lg"
+                                   placeholder="Confirm password" required/>
+                        </div>
+                        <div id="result" style="color: red; text-align: center; margin-bottom: 10px;"></div>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <div class="text-center text-lg-start mt-4 pt-2">
+                            <button type="submit" class="btn btn-primary btn-lg"
+                                    style="padding-left: 2.5rem; padding-right: 2.5rem;">Register
+                            </button>
+                            <p class="small fw-bold mt-2 pt-1 mb-0 ">Already have an account? <a href="/login"
+                                                                                              class="link-danger highlight-text">Login</a>
+                            </p>
+                        </div>
+
+                    </form>
+                </div>
             </div>
-
-            <div class="register-input-field">
-              <label for="birth_day">Birthday:</label>
-              <input type="date" id="birth_day" name="birth_day" required>
+        </div>
+        <div
+              id="footer"  class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+            <!-- Copyright -->
+            <div class="text-white mb-3 mb-md-0">
+                Martina Karaskova Master's project 2023. All rights reserved.
             </div>
-        </div>
+            <!-- Copyright -->
 
-        <div class="register-input-field">
-          <input type="email" id="email" name="email" placeholder="Email">
+            <!-- Right -->
         </div>
-
-        <div class="register-input-field">
-          <input type="password" id="password" name="password" placeholder="Password" required>
-        </div>
-
-        <div class="register-submit-button">
-          <input type="submit" value="Submit">
-        </div>
-      </form>
-
-      <p id="result"></p>
-    </div>
-  </div>
+    </section>
+</div>
 
 <script src="/static/register.js"></script>
 {% endblock %}
+</div>
 </body>
 </html>
