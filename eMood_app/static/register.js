@@ -1,25 +1,21 @@
 $(function() {
-  $('#loginForm').on('submit', function(e) {
-    e.preventDefault();
+  $('#registerForm').on('submit', function(e) {
     if($('#form3Example4').val() === $('#form3Example5').val()) {
-
+        e.preventDefault();
         $.ajax({
             type: 'post',
             url: '/register',
-            data: $('#loginForm').serialize()
-        })
-        .done(function(response) {
-            if (response.startsWith('Email already exists')) {
-                $('#result').html(response);
-            } else {
-                window.location.href = '/login';
+            data: $('#registerForm').serialize(),
+            success: function(response) {
+                if (response.startsWith('Email already exists')) {
+                    $('#result').html(response);
+                } else {
+                    window.location.href = '/login';
+                }
             }
-        })
-        .fail(function(jqXHR, textStatus, errorThrown) {
-            // Display an error message if something goes wrong
-            $('#result').html('Something went wrong. Try again later.');
         });
     } else {
+        e.preventDefault();
         $('#result').html('Passwords must match!');
     }
   });

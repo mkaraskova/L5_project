@@ -14,10 +14,18 @@
             <div class="row d-flex justify-content-center align-items-center h-100">
                 <div class="col-md-8 col-lg-6 col-xl-4 offset-xl-1">
                     <div class="col-12 text-center">
-                        <img src="/static/images/logo.png" class="img-fluid login-logo" alt="Logo">
+                        <img src="/static/images/logo.png"
+                             style="width: 130%"
+                             class="img-fluid login-logo" alt="Logo">
                     </div>
 
-                    <form id="loginForm">
+                    <form id="registerForm">
+                        <!-- Name input -->
+                        <div class="form-outline mb-3">
+                            <input type="name" id="form3Example3" name="name" class="form-control form-control-lg"
+                                   placeholder="Enter a full name" required/>
+                        </div>
+
                         <!-- Email input -->
                         <div class="form-outline mb-3">
                             <input type="email" id="form3Example3" name="email" class="form-control form-control-lg"
