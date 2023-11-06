@@ -5,13 +5,40 @@
     <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
-    <nav>
-        <a href="/"><img src="/static/images/logo.png" alt="logo" id="logo"></a>
-        <ul>
-            <li><a href="/logout">LOG OUT</a></li>
+<!-- Navbar -->
+<nav class="navbar navbar-expand navbar-light bg-light">
+    <!-- Container wrapper -->
+    <div class="container-fluid">
+        <!-- Navbar brand -->
+        <a class="navbar-brand mt-2 mt-lg-0" href="#">
+            <img
+                    id="logo"
+                    src="static/images/logo.png"
+                    height="55"
+                    alt="MDB Logo"
+                    loading="lazy"
+            />
+        </a>
+        <!-- Left links -->
+        <ul class="navbar-nav mr-auto mb-2 mb-lg-0" style="float:left;">
+            <li class="nav-item">
+                <a class="nav-link" href="/dashboard">Dashboard</a>
+            </li>
         </ul>
-    </nav>
-    {% block content %}
-    {% endblock %}
+        <!-- Right links -->
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0" style="float:right;">
+            <li class="nav-item spaced">
+                <a class="nav-link" href="/profile">Profile</a>
+            </li>
+            <li class="nav-item spaced">
+                <a class="nav-link" href="/logout">Sign out</a>
+            </li>
+        </ul>
+    </div>
+    <!-- Container wrapper -->
+</nav>
+<!-- Navbar -->
+{% block content %}
+{% endblock %}
 </body>
 </html>
