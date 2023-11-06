@@ -9,7 +9,6 @@ from flask import Flask, render_template, request, redirect, url_for
 import os
 from datetime import timedelta
 
-
 app = Flask(__name__)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
 login_manager = LoginManager()
@@ -25,9 +24,10 @@ csrf.init_app(app)
 
 
 class User(UserMixin):
-    def __init__(self, name, email, hashed_password):
+    def __init__(self, name, email, gender, hashed_password):
         self.name = name
         self.email = email
+        self.gender = gender
         self.password = hashed_password
 
     def check_password(self, password):
@@ -43,12 +43,21 @@ class User(UserMixin):
         return self.email
 
 
+def update_profile(user_id, update_fields):
+    users.update_one(
+        {"email": user_id},
+        {"$set": update_fields}
+    )
+
+
 @login_manager.user_loader
 def load_user(user_email):
     u = users.find_one({"email": user_email})
-    if not u:
+    if u is None:
         return None
-    return User(u['name'], u['email'], u['password'])
+    if 'gender' not in u:
+        u['gender'] = 'N/A'
+    return User(u['name'], u['email'], u['gender'], u['password'])
 
 
 @app.route('/register', methods=['GET', 'POST'])
@@ -62,6 +71,7 @@ def register():
         "_id": bson.ObjectId(),
         "name": request.form['name'],
         "email": request.form['email'],
+        "gender": "N/A",
         "password": hashed_pwd,
     }
 
@@ -80,7 +90,7 @@ def login():
         if current_user.is_authenticated:
             return redirect(url_for('profile'))
         else:
-            return redirect(url_for('login.html'))
+            return render_template('login.html')
 
     email = request.form.get('email')
     password = request.form.get('password')
@@ -107,8 +117,31 @@ def profile():
     user_data = {
         'name': current_user.name,
         'email': current_user.email,
+        'gender': current_user.gender,
     }
+
     return render_template('profile.html', user=user_data)
+
+
+@app.route('/edit-profile', methods=['POST'])
+@login_required
+def edit_profile():
+    # Get form data
+    name = request.form.get('name')
+    email = request.form.get('email')
+    gender = request.form.get('gender')
+
+    update_fields = {}
+
+    if name:
+        update_fields["name"] = name
+    if email:
+        update_fields["email"] = email
+    if gender:
+        update_fields["gender"] = gender
+
+    update_profile(current_user.email, update_fields)
+    return redirect(url_for('profile'))
 
 
 @app.route('/')
