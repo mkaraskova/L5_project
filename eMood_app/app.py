@@ -11,16 +11,18 @@ import os
 from datetime import timedelta, datetime
 
 app = Flask(__name__)
-detector = FER(mtcnn=False)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
+app.config['SECRET_KEY'] = 'Thisismysecretkey'  # to be changed
+
 login_manager = LoginManager()
 login_manager.init_app(app)
-app.config['SECRET_KEY'] = 'Thisismysecretkey'
 
 client = MongoClient(os.getenv('MONGO_DB'))
 db = client["eMood"]
 users = db["Users"]
 webpages = db["Webpages"]
+
+detector = FER(mtcnn=False)
 
 csrf = CSRFProtect()
 csrf.init_app(app)
@@ -154,7 +156,7 @@ def detect_url():
     current_timestamp = datetime.now()
     if urls:
         webpages.insert_one({
-            "urls": urls,
+            "urls": urls[0],  # only logs the active web page
             "timestamp": current_timestamp
         })
         response = jsonify('Urls added successfully!')
