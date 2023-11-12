@@ -1,5 +1,6 @@
-from datetime import datetime
-
+from flask import Flask, request, jsonify
+from flask_wtf.csrf import CSRFProtect, generate_csrf
+from fer import FER
 import bson
 from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
@@ -7,9 +8,10 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 from flask import Flask, render_template, request, redirect, url_for
 import os
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 app = Flask(__name__)
+detector = FER(mtcnn=False)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -18,6 +20,7 @@ app.config['SECRET_KEY'] = 'Thisismysecretkey'
 client = MongoClient(os.getenv('MONGO_DB'))
 db = client["eMood"]
 users = db["Users"]
+webpages = db["Webpages"]
 
 csrf = CSRFProtect()
 csrf.init_app(app)
@@ -142,6 +145,40 @@ def edit_profile():
 
     update_profile(current_user.email, update_fields)
     return redirect(url_for('profile'))
+
+
+@app.route('/webpage', methods=["POST"])
+def detect_url():
+    data = request.get_json()
+    urls = data['urls']
+    current_timestamp = datetime.now()
+    if urls:
+        webpages.insert_one({
+            "urls": urls,
+            "timestamp": current_timestamp
+        })
+        response = jsonify('Urls added successfully!')
+        response.status_code = 200
+        return response
+    else:
+        return not_found()
+
+
+@app.errorhandler(404)
+def not_found(error=None):
+    message = {
+        'status': 404,
+        'message': 'Not Found: ' + request.url,
+    }
+    resp = jsonify(message)
+    resp.status_code = 404
+    return resp
+
+
+@app.route('/get-csrf-token')
+def csrf_token():
+    token = generate_csrf()
+    return jsonify({"csrf_token": token})
 
 
 @app.route('/')

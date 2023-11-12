@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "Tab Reporter",
+  "version": "1.0",
+  "permissions": ["tabs", "activeTab", "alarms"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "host_permissions": [
+    "http://localhost:4000/",
+    "*://*.amazon.com/*",
+    "*://*.google.com/*",
+    "<all_urls>"
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon.png",
+      "48": "icon.png",
+      "128": "icon.png"
+    }
+  },
+  "icons": {
+    "16": "icon.png",
+    "48": "icon.png",
+    "128": "icon.png"
+  }
+}
