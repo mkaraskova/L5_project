@@ -31,9 +31,12 @@
                     <div class="form-group">
                         <label for="gender">Gender</label>
                         <select class="form-control" id="gender" name="gender">
-                            <option {{ 'selected' if user.gender == 'Female' else '' }}>Female</option>
-                            <option {{ 'selected' if user.gender == 'Male' else '' }}>Male</option>
-                            <option {{ 'selected' if user.gender == 'Other' else '' }}>Other</option>
+                            <option {{
+                            'selected' if user.gender == 'Female' else '' }}>Female</option>
+                            <option {{
+                            'selected' if user.gender == 'Male' else '' }}>Male</option>
+                            <option {{
+                            'selected' if user.gender == 'Other' else '' }}>Other</option>
                         </select>
                     </div>
                 </div>
@@ -98,22 +101,17 @@
                 </div>
             </div>
         </div>
-        <div
-                id="footer"
-                class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary stick">
-            <!-- Copyright -->
-            <div class="mb-3 mb-md-0">
-                Martina Karaskova Master's project 2023.
-            </div>
-            <div class="mb-3 mb-md-0" style="text-align: right">
-                All rights reserved.
-            </div>
-            <!-- Copyright -->
-
-            <!-- Right -->
-        </div>
     </section>
-
+</div>
+<div id="footer"
+     class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary">
+    <!-- Copyright -->
+    <div class="mb-3 mb-md-0">
+        Martina Karaskova Master's project 2023.
+    </div>
+    <div class="mb-3 mb-md-0" style="text-align: right">
+        All rights reserved.
+    </div>
 </div>
 {% endblock %}
 </div>

@@ -93,7 +93,7 @@ def register():
 def login():
     if request.method == 'GET':
         if current_user.is_authenticated:
-            return redirect(url_for('profile'))
+            return redirect(url_for('dashboard'))
         else:
             return render_template('login.html')
 
@@ -126,6 +126,12 @@ def profile():
     }
 
     return render_template('profile.html', user=user_data)
+
+
+@app.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('dashboard.html')
 
 
 @app.route('/edit-profile', methods=['POST'])
