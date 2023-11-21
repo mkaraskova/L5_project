@@ -1,5 +1,22 @@
 let urlLog = [];
 let token = null;
+let userId = null;
+
+// Fetch the user ID when the extension starts up
+fetch(chrome.runtime.getURL('userid.txt'))
+  .then(response => response.text())
+  .then(id => {
+    userId = id.trim(); // Store the user ID for later use
+  });
+
+async function isServerReachable(url) {
+  try {
+    const response = await fetch(url, { method: 'HEAD', mode: 'no-cors' });
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
 
 async function fetchTokenAndPostUrls() {
   chrome.tabs.query({active: true, currentWindow: true}, async (tabs) => {
@@ -8,6 +25,12 @@ async function fetchTokenAndPostUrls() {
       urlLog.push(tab.url);
     }
 
+    let isReachable = await isServerReachable('http://localhost:4000/get-csrf-token');
+    if (!isReachable) {
+      return; // If the server is unreachable, don't throw an error, simply return
+    }
+
+    // Regular logic here
     try {
       const response = await fetch('http://localhost:4000/get-csrf-token');
       const data = await response.json();
@@ -24,7 +47,7 @@ async function fetchTokenAndPostUrls() {
             'Content-Type': 'application/json',
             'X-CSRFToken': token // Token is used here
           },
-          body: JSON.stringify({ urls: urlLog }),
+          body: JSON.stringify({ urls: urlLog,  userId: userId }),
         });
 
         const data = await response.json();

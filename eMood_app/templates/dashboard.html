@@ -4,7 +4,7 @@
     <title>Profile Page</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
@@ -12,12 +12,48 @@
 <body class="no-scroll">
 {% extends "base.html" %}
 {% block content %}
+<!-- The Add Person Modal -->
+<div class="modal" id="myModal" tabindex="-1" style="margin-top: 80px;">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form id="addPersonForm" action="/add-person" method="post">
+                <div class="modal-header">
+                    <h5 class="modal-title">Add Person</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" class="form-control" id="name" name="name" required>
+                    </div>
+                    <h3 style="text-align: center">Instructions</h3>
+                    <ol>
+                        <li>When you click the Add button, the zip file will automatically download.</li>
+                        <li>Unzip this file to a directory of your choice.</li>
+                        <li>After, open a Chrome browser and navigate to Manage Extensions.</li>
+                        <li>Ensure the Developer Mode is selected in the right upper corner.</li>
+                        <li>Afterward, click on the Load unpacked and select the folder with the unzipped extension.
+                        </li>
+                        <li>Now you are ready to monitor the person's moods.</li>
+                    </ol>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            </form>
+        </div>
+    </div>
+</div>
+
 <div class="container" style="margin-top:60px;">
     <!--Main layout-->
     <div class="container">
         <div class="row justify-content-end">
             <div class="col-md-6 text-md-end">
-                <button type="button" class="btn btn-primary" style="float:right;">+ Add Person</button>
+                <a data-toggle="modal" data-target="#myModal" style="cursor: pointer;">
+                    <button type="button" class="btn btn-primary" style="float:right;">+ Add Person</button>
+                </a>
             </div>
         </div>
         <div class="row justify-content-center">
@@ -31,19 +67,22 @@
                 >
                     Dropdown button
                 </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                    <li><a class="dropdown-item" href="#">Action</a></li>
-                    <li><a class="dropdown-item" href="#">Another action</a></li>
-                    <li><a class="dropdown-item" href="#">Something else here</a></li>
+                <ul class="dropdown-menu text-center" aria-labelledby="dropdownMenuButton">
+                    {% for user in monitored_users %}
+                    <li><a class="dropdown-item text-center" href="#">{{ user.name }}</a></li>
+                    {% endfor %}
                 </ul>
             </div>
         </div>
         <section class="border-bottom pb-4 mb-5">
-
+            <!-- Display selected user's name below the dropdown button -->
+            <div class="row justify-content-center mt-3">
+                <div id="selectedUserName"></div>
+            </div>
         </section>
 
         <section>
-            <h6 style="font-style: italic; text-align: center; color: grey;"> No person being monitored</h6>
+            <h6 style="font-style: italic; text-align: center; color: grey;">No person selected</h6>
         </section>
         <!--Section: Content-->
 
@@ -61,8 +100,7 @@
         All rights reserved.
     </div>
 </div>
-{% endblock %}
-
 <script src="/static/dashboard.js"></script>
+{% endblock %}
 </body>
 </html>

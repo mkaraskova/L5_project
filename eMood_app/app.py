@@ -1,4 +1,9 @@
-from flask import Flask, request, jsonify
+import io
+import shutil
+import uuid
+from flask import send_file
+
+from flask import Flask, request, jsonify, send_from_directory
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from fer import FER
 import bson
@@ -9,6 +14,8 @@ from flask_login import LoginManager, UserMixin, login_user, login_required, cur
 from flask import Flask, render_template, request, redirect, url_for
 import os
 from datetime import timedelta, datetime
+
+from helpers import *
 
 app = Flask(__name__)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
@@ -21,6 +28,7 @@ client = MongoClient(os.getenv('MONGO_DB'))
 db = client["eMood"]
 users = db["Users"]
 webpages = db["Webpages"]
+monitored_users = db["MonitoredUsers"]
 
 detector = FER(mtcnn=False)
 
@@ -131,7 +139,8 @@ def profile():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    return render_template('dashboard.html')
+    monitored_users_list = monitored_users.find({"creator": current_user.email})
+    return render_template('dashboard.html', monitored_users=monitored_users_list)
 
 
 @app.route('/edit-profile', methods=['POST'])
@@ -158,10 +167,12 @@ def edit_profile():
 @app.route('/webpage', methods=["POST"])
 def detect_url():
     data = request.get_json()
+    user_id = data.get('userId')
     urls = data['urls']
     current_timestamp = datetime.now()
     if urls:
         webpages.insert_one({
+            "userId": user_id,
             "urls": urls[0],  # only logs the active web page
             "timestamp": current_timestamp
         })
@@ -170,6 +181,38 @@ def detect_url():
         return response
     else:
         return not_found()
+
+
+@app.route('/add-person', methods=["POST"])
+def add_person():
+    name = request.form.get('name')
+    user_id = str(uuid.uuid4())
+    creator = current_user.email
+
+    # Create a BytesIO object to hold the ZIP file in memory
+    zip_buffer = io.BytesIO()
+
+    with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zipf:
+        # add all plugin files
+        for file in os.listdir('eMood_app/eMood_plugin'):
+            file_path = os.path.join('eMood_app/eMood_plugin', file)
+            if os.path.isfile(file_path):
+                zipf.write(file_path, arcname=os.path.join(f"eMood_plugin_{name}", file))
+
+        # Add userid.txt directly to the ZIP file
+        zipf.writestr(f"eMood_plugin_{name}/userid.txt", user_id.encode('utf-8'))
+
+    # Reset the buffer position to the beginning
+    zip_buffer.seek(0)
+
+    monitored_users.insert_one({"userId": user_id, "creator": creator, "name": name})
+
+    # Return the generated ZIP file as a Flask response without saving it locally
+    return send_file(
+        zip_buffer,
+        as_attachment=True,
+        download_name=f"eMood_plugin_{name}.zip"
+    )
 
 
 @app.errorhandler(404)
