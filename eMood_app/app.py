@@ -24,6 +24,7 @@ app.config['SECRET_KEY'] = 'Thisismysecretkey'  # to be changed
 login_manager = LoginManager()
 login_manager.init_app(app)
 
+# Initialize MongoDB client and collections
 client = MongoClient(os.getenv('MONGO_DB'))
 db = client["eMood"]
 users = db["Users"]
@@ -141,6 +142,21 @@ def profile():
 def dashboard():
     monitored_users_list = monitored_users.find({"creator": current_user.email})
     return render_template('dashboard.html', monitored_users=monitored_users_list)
+
+
+@app.route('/user/<username>')
+@login_required
+def get_user(username):
+    user = monitored_users.find_one({"name": username, "creator": current_user.email})
+    monitored_webpages = webpages.find({"userId": user['userId']})
+    # monitored_moods = moods.find({"userId": user['userId']})
+
+    user_data = {
+        "user": user,
+        "webpages": monitored_webpages,
+        # "moods": monitored_moods
+    }
+    return jsonify(user_data)
 
 
 @app.route('/edit-profile', methods=['POST'])

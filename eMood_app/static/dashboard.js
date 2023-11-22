@@ -33,6 +33,9 @@ $(document).ready(function () {
         var selectedUserName = $(this).text();
         $('#selectedUserName').text(selectedUserName);
 
+        $.get(`/user/${selectedUserName}`, function (data) {
+
+        });
         $(this).closest('.dropdown').find('.dropdown-toggle').trigger('click');
     });
 });
