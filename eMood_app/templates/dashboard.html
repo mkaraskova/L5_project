@@ -58,35 +58,27 @@
         </div>
         <div class="row justify-content-center">
             <div class="dropdown">
-                <button
-                        class="btn btn-primary dropdown-toggle"
-                        type="button"
-                        id="dropdownMenuButton"
-                        data-toggle="dropdown"
-                        aria-expanded="false"
-                >
-                    Dropdown button
+                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-expanded="false" style="min-width:150px;">
+                    Display ... &nbsp;&nbsp;&nbsp;
                 </button>
                 <ul class="dropdown-menu text-center" aria-labelledby="dropdownMenuButton">
                     {% for user in monitored_users %}
-                    <li><a class="dropdown-item text-center" href="#">{{ user.name }}</a></li>
+                    <li><a class="dropdown-item text-center" href="#" onclick="updateDropdownText('{{ user.name }}')">
+                        {{ user.name }}
+                    </a></li>
                     {% endfor %}
                 </ul>
             </div>
+
         </div>
         <section class="border-bottom pb-4 mb-5">
-            <!-- Display selected user's name below the dropdown button -->
-            <div class="row justify-content-center mt-3">
-                <div id="selectedUserName"></div>
-            </div>
+            <!-- divider -->
         </section>
 
-        <section>
+        <section id="selectedUserInfo">
             <h6 style="font-style: italic; text-align: center; color: grey;">No person selected</h6>
         </section>
-        <!--Section: Content-->
-
-
     </div>
     <!--Main layout-->
 </div>

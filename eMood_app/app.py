@@ -1,8 +1,9 @@
 import io
+import json
 import shutil
 import uuid
 from flask import send_file
-
+import subprocess
 from flask import Flask, request, jsonify, send_from_directory
 from flask_wtf.csrf import CSRFProtect, generate_csrf
 from fer import FER
@@ -29,6 +30,7 @@ client = MongoClient(os.getenv('MONGO_DB'))
 db = client["eMood"]
 users = db["Users"]
 webpages = db["Webpages"]
+moods = db["Moods"]
 monitored_users = db["MonitoredUsers"]
 
 detector = FER(mtcnn=False)
@@ -144,19 +146,24 @@ def dashboard():
     return render_template('dashboard.html', monitored_users=monitored_users_list)
 
 
-@app.route('/user/<username>')
+@app.route('/dashboard/<user_name>')
 @login_required
-def get_user(username):
-    user = monitored_users.find_one({"name": username, "creator": current_user.email})
-    monitored_webpages = webpages.find({"userId": user['userId']})
-    # monitored_moods = moods.find({"userId": user['userId']})
-
-    user_data = {
-        "user": user,
-        "webpages": monitored_webpages,
-        # "moods": monitored_moods
-    }
-    return jsonify(user_data)
+def user_dashboard(user_name):
+    user_details = monitored_users.find_one({"name": user_name, "creator": current_user.email})
+    if user_details:
+        user_id = user_details['userId']
+        user_moods = list(moods.find({"userId": user_id}))
+        if user_moods:
+            [mood.pop('_id') for mood in user_moods]
+        user_webpages = list(webpages.find({"userId": user_id}))
+        if user_webpages:
+            [webpage.pop('_id') for webpage in user_webpages]
+        user_info = {
+            "name": user_details['name'],
+            "moods": user_moods,
+            "webpages": user_webpages
+        }
+        return jsonify(user_info)
 
 
 @app.route('/edit-profile', methods=['POST'])
@@ -209,13 +216,29 @@ def add_person():
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zipf:
-        # add all plugin files
+        # add plugin files
         for file in os.listdir('eMood_app/eMood_plugin'):
             file_path = os.path.join('eMood_app/eMood_plugin', file)
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_plugin_{name}", file))
 
-        # Add userid.txt directly to the ZIP file
+        # add detector executable
+        file_path = os.path.join('eMood_app', 'eMood_detector', 'emotion_detector.py')
+        mongo_connection = os.getenv('MONGO_DB')
+
+        with open('eMood_app/eMood_detector/settings.json', 'w') as settings_file:
+            json.dump({
+                'userId': user_id,
+                'mongoConnection': mongo_connection
+            }, settings_file)
+
+        # add plugin files
+        for file in os.listdir('eMood_app/eMood_detector'):
+            file_path = os.path.join('eMood_app/eMood_detector', file)
+            if os.path.isfile(file_path):
+                zipf.write(file_path, arcname=os.path.join(f"eMood_detector_{name}", file))
+
+        # Add userid.txt to plugin
         zipf.writestr(f"eMood_plugin_{name}/userid.txt", user_id.encode('utf-8'))
 
     # Reset the buffer position to the beginning

@@ -29,13 +29,38 @@ $(document).ready(function () {
             .catch(error => console.log('error', error));
     });
 
-    $('.dropdown-item').on('click', function () {
-        var selectedUserName = $(this).text();
-        $('#selectedUserName').text(selectedUserName);
-
-        $.get(`/user/${selectedUserName}`, function (data) {
-
+    function fetchUserInfo(userName) {
+        $.ajax({
+            url: `/dashboard/${userName}`,
+            type: 'GET',
+            success: function (data) {
+                // Update the content with user information
+                displayUserData(data);
+            },
+            error: function (error) {
+                console.error('Error fetching user info:', error);
+            }
         });
-        $(this).closest('.dropdown').find('.dropdown-toggle').trigger('click');
+    }
+
+    // Call fetchUserInfo when a user is clicked in the dropdown
+    $('.dropdown-item').click(function (e) {
+        e.preventDefault();
+        var userName = $(this).text().trim();
+
+        // Update URL without reloading the page
+        history.pushState({}, '', `/dashboard/${userName}`);
+
+        fetchUserInfo(userName);
     });
 });
+
+function updateDropdownText(selectedOption) {
+    document.getElementById('dropdownMenuButton').innerText = selectedOption + '\u00A0\u00A0\u00A0';
+    var dropdownToggle = document.querySelector('.dropdown-toggle');
+    dropdownToggle.click();
+}
+
+function displayUserData(userData) {
+
+}
