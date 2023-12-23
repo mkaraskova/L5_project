@@ -16,11 +16,17 @@
     margin-bottom: -20px;
 }
 body {
+    display: flex;
+    flex-direction: column;
     position: relative;
     margin: 0;
-    padding-bottom: 6rem; /* Footer height */
-    min-height: 100%;
+    min-height: 100vh;
 }
+
+main {
+    flex: 1 0 auto;
+}
+
 .divider:after,
 .divider:before {
     content: "";
@@ -74,3 +80,10 @@ body {
     top: 60px;
 }
 
+.transparent-button {
+    background: transparent !important;
+    border: none !important;
+    max-width: 100%;
+    max-height: 100%;
+    color: black;
+}

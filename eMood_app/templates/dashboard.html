@@ -12,6 +12,7 @@
 <body class="no-scroll">
 {% extends "base.html" %}
 {% block content %}
+<main>
 <!-- The Add Person Modal -->
 <div class="modal" id="myModal" tabindex="-1" style="margin-top: 80px;">
     <div class="modal-dialog">
@@ -56,42 +57,56 @@
                 </a>
             </div>
         </div>
-        <div class="row justify-content-center">
-            <div class="dropdown">
-                <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton"
-                        data-toggle="dropdown" aria-expanded="false" style="min-width:150px;">
-                    Display ... &nbsp;&nbsp;&nbsp;
-                </button>
-                <ul class="dropdown-menu text-center" aria-labelledby="dropdownMenuButton">
-                    {% for user in monitored_users %}
-                    <li><a class="dropdown-item text-center" href="#" onclick="updateDropdownText('{{ user.name }}')">
-                        {{ user.name }}
-                    </a></li>
-                    {% endfor %}
-                </ul>
+        <div class="d-flex flex-row flex-wrap justify-content-center">
+            {% for user in monitored_users %}
+            <div class="col-3 col-sm-3 col-md-2 col-lg-1">
+            <button class="btn btn-primary transparent-button d-flex flex-column align-items-center justify-content-center"
+                    onclick="fetchUserInfo('{{ user.name }}')">
+                <img src="/static/images/profile.png" alt="User Image" class="img-responsive img-fluid">
+                <span>{{ user.name }}</span>
+            </button>
             </div>
-
+            {% endfor %}
         </div>
         <section class="border-bottom pb-4 mb-5">
             <!-- divider -->
         </section>
 
-        <section id="selectedUserInfo">
-            <h6 style="font-style: italic; text-align: center; color: grey;">No person selected</h6>
+        <section id="selectedUserData">
+            <div class="row justify-content-center" id="noUserSelected">
+                 <!-- Insert your content here -->
+            </div>
+            <div class="row mx-auto">
+                <div id="selectedUserPicture" class="col-6 d-flex justify-content-end">
+                    <!-- Insert your content here -->
+                </div>
+                <div id="selectedUserInfo" class="col-6 d-flex flex-column justify-content-start">
+                    <!-- Insert your content here -->
+                </div>
+            </div>
+            <div class="row">
+                <div id="selectedUserMoods" class="col">
+                    <!-- Insert your content here -->
+                </div>
+                <div id="selectedUserWebsites" class="col">
+                    <!-- Insert your content here -->
+                </div>
+                <div class="col">
+                    <!-- Insert your content here -->
+                </div>
+            </div>
         </section>
     </div>
     <!--Main layout-->
 </div>
-<div id="footer"
-     class="d-flex flex-column flex-md-row text-center text-md-start justify-content-between py-4 px-4 px-xl-5 bg-primary stick">
+</main>
+<footer class="bg-body-tertiary text-center text-lg-start footer">
     <!-- Copyright -->
-    <div class="mb-3 mb-md-0">
-        Martina Karaskova Master's project 2023.
+    <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
+        © 2023 Copyright: Martina Karaskova Master's project
     </div>
-    <div class="mb-3 mb-md-0" style="text-align: right">
-        All rights reserved.
-    </div>
-</div>
+    <!-- Copyright -->
+</footer>
 <script src="/static/dashboard.js"></script>
 {% endblock %}
 </body>
