@@ -96,8 +96,8 @@ function displayUserData(userData) {
         $('#selectedUserInfo').append('<p></p><p></p>');
         $('#selectedUserInfo').append('<p><strong>Name:</strong>  ' + userData.name + '</p>');
         $('#selectedUserInfo').append('<p><strong>Last active:</strong>  ' + userData.active + '</p>');
-        $('#selectedUserInfo').append('<p><strong>Most experienced mood:</strong>  ' + mostFrequentMood + '</p>');
-        $('#selectedUserInfo').append('<p><strong>Most visited website:</strong>  ' + mostFrequentWebsite + '</p>');
+        $('#selectedUserInfo').append('<p><strong>Most frequent mood:</strong>  ' + mostFrequentMood + '</p>');
+        $('#selectedUserInfo').append(`<p><strong>Most visited website:</strong> <a href="${mostFrequentWebsite}" target="_blank">${mostFrequentWebsite}</a></p>`);
 
         $('#selectedUserMoods').append('<p>User Moods:</p>').append(moodList);
         $('#selectedUserWebsites').append('<p>User Visited pages:</p>').append(webpageList);
