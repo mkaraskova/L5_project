@@ -1,9 +1,6 @@
 .navbar {
     background-color: #B89BC7 !important;
-}
-.custom-navbar-nav {
-    margin-left: auto;
-    margin-left: 70px;
+    max-height: 70px;
 }
 .spaced {
   margin-right: 20px;
