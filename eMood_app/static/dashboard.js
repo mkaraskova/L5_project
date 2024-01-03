@@ -1,5 +1,9 @@
+let selectedUser = null;
 $(document).ready(function () {
     displayUserData();
+    $('button.btn.btn-secondary').on('click', function (e) {
+        location.reload();
+    });
     $('#addPersonForm').on('submit', function (e) {
         e.preventDefault();
 
@@ -25,6 +29,29 @@ $(document).ready(function () {
             })
             .catch(error => console.log('error', error));
     });
+    $('#deletePersonForm').on('submit', function (e) {
+        e.preventDefault();
+
+        let form = $(this);
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: {
+                csrf_token: form.find('input[name="csrf_token"]').val(),
+                userId: selectedUser
+            },
+            success: function (response) {
+                console.log(response);
+                selectedUser = null;
+                $('.modal-footer .btn-primary').hide();
+                $('.modal-body').html('<h6 style="font-style: italic; text-align: center; color: grey;">Monitored user successfully deleted</h6>');
+            },
+            error: function (error) {
+                console.log(error);
+                $('.modal-body').html('<h6 style="font-style: italic; text-align: center; color: grey;">There was an error deleting the user, please try again.</h6>');
+            }
+        });
+    });
 });
 
 function fetchUserInfo(userName) {
@@ -32,6 +59,7 @@ function fetchUserInfo(userName) {
         url: `/dashboard/${userName}`,
         type: 'GET',
         success: function (data) {
+            selectedUser = data.id;
             // Update the content with user information
             displayUserData(data);
         },
@@ -42,14 +70,14 @@ function fetchUserInfo(userName) {
 }
 
 function findMostFrequent(arr) {
-    if(arr.length === 0)
+    if (arr.length === 0)
         return null;
 
     let freqMap = {};
     let maxCount = 0;
     let mostFrequentItem = null;
 
-    arr.forEach(function(item) {
+    arr.forEach(function (item) {
         freqMap[item] = (freqMap[item] + 1) || 1;
         if (freqMap[item] > maxCount) {
             maxCount = freqMap[item];
@@ -62,6 +90,7 @@ function findMostFrequent(arr) {
 
 function displayUserData(userData) {
     // Clear old data
+    $('#deleteUser').empty();
     $('#selectedUserPicture').empty();
     $('#selectedUserInfo').empty();
     $('#selectedUserMoods').empty();
@@ -70,9 +99,7 @@ function displayUserData(userData) {
     if (!userData) {
         $('#noUserSelected').append('<em><p style=\"color:gray;\">No user selected</p></em>');
         return;
-    }
-
-    else {
+    } else {
         $('#noUserSelected').empty();
 
         var webpageList = $('<ul>');
@@ -90,8 +117,16 @@ function displayUserData(userData) {
         let webpages = userData.webpages.map(w => w.urls);
         let mostFrequentWebsite = findMostFrequent(webpages);
 
-        var userImage = $('<img>').attr('src', '/static/images/profile.png').css({ 'max-width': '200px', 'max-height': '200px' });
-        userImage.addClass('img-fluid');
+        var userImage = $('<img>').attr('src', '/static/images/profile.png').css({
+            'max-width': '200px',
+            'max-height': '200px'
+        }).addClass('img-fluid');
+        var deleteUser = $('<button class="transparent-button">').html('<img src="/static/images/bin.png" style="max-width: 30px; max-heigth: 30px;">').addClass('img-fluid');
+        deleteUser.click(function () {
+            $('#deletePersonModal').modal('show');
+        });
+
+        $('#deleteUser').append(deleteUser);
         $('#selectedUserPicture').append(userImage);
         $('#selectedUserInfo').append('<p></p><p></p>');
         $('#selectedUserInfo').append('<p><strong>Name:</strong>  ' + userData.name + '</p>');

@@ -160,6 +160,7 @@ def user_dashboard(user_name):
             [webpage.pop('_id') for webpage in user_webpages]
         user_info = {
             "name": user_details['name'],
+            "id": user_id,
             "moods": user_moods,
             "webpages": user_webpages
         }
@@ -204,6 +205,18 @@ def detect_url():
         return response
     else:
         return not_found()
+
+
+@app.route('/delete-person', methods=["POST"])
+def delete_person():
+    person_id = request.form.get('userId')
+    if person_id is not None:
+        monitored_users.delete_one({'userId': person_id})
+        moods.delete_many({'id': person_id})
+        webpages.delete_many({'id': person_id})
+        return jsonify({'message': f'User deleted successfully'}), 200
+
+    return jsonify({'message': 'No user name provided'}), 400
 
 
 @app.route('/add-person', methods=["POST"])

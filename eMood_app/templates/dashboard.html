@@ -13,92 +13,115 @@
 {% extends "base.html" %}
 {% block content %}
 <main>
-<!-- The Add Person Modal -->
-<div class="modal" id="myModal" tabindex="-1" style="margin-top: 80px;">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <form id="addPersonForm" action="/add-person" method="post">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add Person</h5>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label for="name">Name</label>
-                        <input type="text" class="form-control" id="name" name="name" required>
+    <!-- The Add Person Modal -->
+    <div class="modal" id="addPersonModal" tabindex="-1" style="margin-top: 80px;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="addPersonForm" action="/add-person" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Add Person</h5>
                     </div>
-                    <h3 style="text-align: center">Instructions</h3>
-                    <ol>
-                        <li>When you click the Add button, the zip file will automatically download.</li>
-                        <li>Unzip this file to a directory of your choice.</li>
-                        <li>After, open a Chrome browser and navigate to Manage Extensions.</li>
-                        <li>Ensure the Developer Mode is selected in the right upper corner.</li>
-                        <li>Afterward, click on the Load unpacked and select the folder with the unzipped extension.
-                        </li>
-                        <li>Now you are ready to monitor the person's moods.</li>
-                    </ol>
-                </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary">Add</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                </div>
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-            </form>
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="name">Name</label>
+                            <input type="text" class="form-control" id="name" name="name" required>
+                        </div>
+                        <h3 style="text-align: center">Instructions</h3>
+                        <ol>
+                            <li>When you click the Add button, the zip file will automatically download.</li>
+                            <li>Unzip this file to a directory of your choice.</li>
+                            <li>After, open a Chrome browser and navigate to Manage Extensions.</li>
+                            <li>Ensure the Developer Mode is selected in the right upper corner.</li>
+                            <li>Afterward, click on the Load unpacked and select the folder with the unzipped extension.
+                            </li>
+                            <li>Now you are ready to monitor the person's moods.</li>
+                        </ol>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Add</button>
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    </div>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="container" style="margin-top:60px;">
-    <!--Main layout-->
-    <div class="container">
-        <div class="row justify-content-end">
-            <div class="col-md-6 text-md-end">
-                <a data-toggle="modal" data-target="#myModal" style="cursor: pointer;">
-                    <button type="button" class="btn btn-primary" style="float:right;">+ Add Person</button>
-                </a>
+    <div class="modal" id="deletePersonModal" tabindex="-1" style="margin-top: 80px;">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <form id="deletePersonForm" action="/delete-person" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Delete monitored user</h5>
+                    </div>
+                    <div class="modal-body">
+                        <p style="text-align: center">Would you like to permanently delete this monitored user?</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Yes, delete user</button>
+                    </div>
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                </form>
             </div>
         </div>
-        <div class="d-flex flex-row flex-wrap justify-content-center">
-            {% for user in monitored_users %}
-            <div class="col-3 col-sm-3 col-md-2 col-lg-1">
-            <button class="btn btn-primary transparent-button d-flex flex-column align-items-center justify-content-center"
-                    onclick="fetchUserInfo('{{ user.name }}')">
-                <img src="/static/images/profile.png" alt="User Image" class="img-responsive img-fluid">
-                <span>{{ user.name }}</span>
-            </button>
-            </div>
-            {% endfor %}
-        </div>
-        <section class="border-bottom pb-4 mb-5">
-            <!-- divider -->
-        </section>
-
-        <section id="selectedUserData">
-            <div class="row justify-content-center" id="noUserSelected">
-                 <!-- Insert your content here -->
-            </div>
-            <div class="row mx-auto">
-                <div id="selectedUserPicture" class="col-6 d-flex justify-content-end">
-                    <!-- Insert your content here -->
-                </div>
-                <div id="selectedUserInfo" class="col-6 d-flex flex-column justify-content-start">
-                    <!-- Insert your content here -->
-                </div>
-            </div>
-            <div class="row">
-                <div id="selectedUserMoods" class="col">
-                    <!-- Insert your content here -->
-                </div>
-                <div id="selectedUserWebsites" class="col">
-                    <!-- Insert your content here -->
-                </div>
-                <div class="col">
-                    <!-- Insert your content here -->
-                </div>
-            </div>
-        </section>
     </div>
-    <!--Main layout-->
-</div>
+
+    <div class="container" style="margin-top:60px;">
+        <!--Main layout-->
+        <div class="container">
+            <div class="row justify-content-end">
+                <div class="col-md-6 text-md-end">
+                    <a data-toggle="modal" data-target="#addPersonModal" style="cursor: pointer;">
+                        <button type="button" class="btn btn-primary" style="float:right;">+ Add Person</button>
+                    </a>
+                </div>
+            </div>
+            <div class="d-flex flex-row flex-wrap justify-content-center">
+                {% for user in monitored_users %}
+                <div class="col-3 col-sm-3 col-md-2 col-lg-1">
+                    <button class="btn btn-primary transparent-button d-flex flex-column align-items-center justify-content-center"
+                            onclick="fetchUserInfo('{{ user.name }}')">
+                        <img src="/static/images/profile.png" alt="User Image" class="img-responsive img-fluid">
+                        <span>{{ user.name }}</span>
+                    </button>
+                </div>
+                {% endfor %}
+            </div>
+            <section class="border-bottom pb-4 mb-5">
+                <!-- divider -->
+            </section>
+
+            <section id="selectedUserData">
+                <div class="row justify-content-center" id="noUserSelected">
+                    <!-- Insert your content here -->
+                </div>
+                <div class="row mx-auto">
+                    <div id="selectedUserPicture" class="col-5 d-flex justify-content-end">
+                        <!-- Insert your content here -->
+                    </div>
+                    <div id="selectedUserInfo" class="col-5 d-flex flex-column justify-content-start">
+                        <!-- Insert your content here -->
+                    </div>
+                    <div id="deleteUser" class="col-2 d-flex flex-column justify-content-start">
+                        <!-- Insert your content here -->
+                    </div>
+                </div>
+                <div class="row">
+                    <div id="selectedUserMoods" class="col">
+                        <!-- Insert your content here -->
+                    </div>
+                    <div id="selectedUserWebsites" class="col">
+                        <!-- Insert your content here -->
+                    </div>
+                    <div class="col">
+                        <!-- Insert your content here -->
+                    </div>
+                </div>
+            </section>
+        </div>
+        <!--Main layout-->
+    </div>
 </main>
 <footer class="bg-body-tertiary text-center text-lg-start footer">
     <!-- Copyright -->
