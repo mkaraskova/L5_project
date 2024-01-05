@@ -161,6 +161,7 @@ def user_dashboard(user_name):
         user_info = {
             "name": user_details['name'],
             "id": user_id,
+            "active": user_details.get('active'),
             "moods": user_moods,
             "webpages": user_webpages
         }
@@ -200,11 +201,30 @@ def detect_url():
             "urls": urls[0],  # only logs the active web page
             "timestamp": current_timestamp
         })
+        monitored_users.update_one({"userId": user_id}, {"$set": {
+            "active": current_timestamp
+        }})
         response = jsonify('Urls added successfully!')
         response.status_code = 200
         return response
     else:
         return not_found()
+
+
+@app.route('/mood', methods=["POST"])
+def detect_mood():
+    data = request.get_json()
+    user_id = data.get('userId')
+    current_timestamp = datetime.now()
+    moods.insert_one({
+        "userId": user_id,
+        "mood": data['mood'],
+        "confidence": data['confidence'],
+        "timestamp": current_timestamp
+    })
+    response = jsonify('Mood detected successfully!')
+    response.status_code = 200
+    return response
 
 
 @app.route('/delete-person', methods=["POST"])
@@ -222,6 +242,7 @@ def delete_person():
 @app.route('/add-person', methods=["POST"])
 def add_person():
     name = request.form.get('name')
+    monitor = request.form.get('monitor')
     user_id = str(uuid.uuid4())
     creator = current_user.email
 
@@ -235,8 +256,6 @@ def add_person():
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_plugin_{name}", file))
 
-        # add detector executable
-        file_path = os.path.join('eMood_app', 'eMood_detector', 'emotion_detector.py')
         mongo_connection = os.getenv('MONGO_DB')
 
         with open('eMood_app/eMood_detector/settings.json', 'w') as settings_file:
@@ -251,13 +270,13 @@ def add_person():
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_detector_{name}", file))
 
-        # Add userid.txt to plugin
-        zipf.writestr(f"eMood_plugin_{name}/userid.txt", user_id.encode('utf-8'))
+        # Add userid and monitor time to plugin
+        zipf.writestr(f"eMood_plugin_{name}/userid.txt", f"{user_id}\n{monitor}".encode('utf-8'))
 
     # Reset the buffer position to the beginning
     zip_buffer.seek(0)
 
-    monitored_users.insert_one({"userId": user_id, "creator": creator, "name": name})
+    monitored_users.insert_one({"userId": user_id, "creator": creator, "name": name, "active": None})
 
     # Return the generated ZIP file as a Flask response without saving it locally
     return send_file(
