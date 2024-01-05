@@ -232,8 +232,8 @@ def delete_person():
     person_id = request.form.get('userId')
     if person_id is not None:
         monitored_users.delete_one({'userId': person_id})
-        moods.delete_many({'id': person_id})
-        webpages.delete_many({'id': person_id})
+        moods.delete_many({'userId': person_id})
+        webpages.delete_many({'userId': person_id})
         return jsonify({'message': f'User deleted successfully'}), 200
 
     return jsonify({'message': 'No user name provided'}), 400
