@@ -1,5 +1,6 @@
 let selectedUser = null;
 let moodChart;
+let webpageBarChart;
 moodColors = {
     "happy": {'backgroundColor': 'rgba(255, 255, 0, 0.2)', 'borderColor': 'rgba(255, 255, 0, 1)'},   // Yellow
     "sad": {'backgroundColor': 'rgba(0, 0, 255, 0.2)', 'borderColor': 'rgba(0, 0, 255, 1)'},         // Blue
@@ -110,6 +111,9 @@ function displayUserData(userData) {
     if (moodChart) {
         moodChart.destroy();
     }
+    if (webpageBarChart) {
+        webpageBarChart.destroy();
+    }
 
     if (!userData) {
         $('#noUserSelected').append('<em><p style=\"color:gray;\">No user selected</p></em>');
@@ -117,42 +121,75 @@ function displayUserData(userData) {
     } else {
         $('#noUserSelected').empty();
 
-        var webpageList = $('<ul>');
-        userData.webpages.forEach(function (webpage) {
-            webpageList.append('<li>URL: ' + webpage.urls + '</li>');
-        });
+        // mood Pie Chart
+        {
+            var ctx = document.getElementById('moodPieChart').getContext('2d');
 
-        var ctx = document.getElementById('moodPieChart').getContext('2d');
-        let moodData = {};
-        userData.moods.forEach(m => {
-            moodData[m.mood] = (moodData[m.mood] + 1) || 1;
-        });
-        let moodBackgroundColors = [];
-        let moodBorderColors = [];
-        for (let mood in moodData) {
-            if (moodColors[mood]) {
-                moodBackgroundColors.push(moodColors[mood]['backgroundColor']);
-                moodBorderColors.push(moodColors[mood]['borderColor']);
-            } else {
-                console.log(`Undefined Mood:${mood}`);
+            let moodData = {};
+            userData.moods.forEach(m => {
+                moodData[m.mood] = (moodData[m.mood] + 1) || 1;
+            });
+            let moodBackgroundColors = [];
+            let moodBorderColors = [];
+            for (let mood in moodData) {
+                if (moodColors[mood]) {
+                    moodBackgroundColors.push(moodColors[mood]['backgroundColor']);
+                    moodBorderColors.push(moodColors[mood]['borderColor']);
+                } else {
+                    console.log(`Undefined Mood:${mood}`);
+                }
             }
+            var data = {
+                labels: Object.keys(moodData),
+                datasets: [{
+                    data: Object.values(moodData),
+                    backgroundColor: moodBackgroundColors,
+                    borderColor: moodBorderColors,
+                    borderWidth: 1
+                }]
+            };
+            console.log(moodData);
+            console.log(moodBackgroundColors);
+            console.log(moodBorderColors);
+            moodChart = new Chart(ctx, {
+                type: 'pie',
+                data: data,
+            });
         }
-        var data = {
-            labels: Object.keys(moodData),
-            datasets: [{
-                data: Object.values(moodData),
-                backgroundColor: moodBackgroundColors,
-                borderColor: moodBorderColors,
-                borderWidth: 1
-            }]
-        };
-        console.log(moodData);
-        console.log(moodBackgroundColors);
-        console.log(moodBorderColors);
-        moodChart = new Chart(ctx, {
-            type: 'pie',
-            data: data,
-        });
+
+        // webpage Bar Chart
+        {
+            let webpageData = {};
+            userData.webpages.forEach(w => {
+                try {
+                    let urlString = w.urls;
+                    // Add 'https://' if it is not present
+                    if (!/^https?:\/\//i.test(urlString)) {
+                        urlString = 'https://' + urlString;
+                    }
+                    let url = new URL(urlString).hostname;
+                    webpageData[url] = (webpageData[url] + 1) || 1;
+                } catch (e) {
+                    console.error('Invalid URL: ', w.urls);
+                }
+            });
+            var ctxWebpage = document.getElementById('webPageBarChart').getContext('2d');
+            var webpageChartData = {
+                labels: Object.keys(webpageData),
+                datasets: [{
+                    label: 'Webpage frequency',
+                    data: Object.values(webpageData),
+                    backgroundColor: '#B89BC7',
+                    borderColor: '#B89BC7'
+                }]
+            };
+
+            webpageBarChart = new Chart(ctxWebpage, {
+                type: 'bar',
+                data: webpageChartData
+            });
+        }
+
 
         let moods = userData.moods.map(m => m.mood);
         const mostFrequentMood = findMostFrequent(moods);
