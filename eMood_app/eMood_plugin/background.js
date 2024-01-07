@@ -15,6 +15,11 @@ fetch(chrome.runtime.getURL('userid.txt'))
         const [id, period] = text.split('\n');
         userId = id.trim();
         periodInMinutes = Number(period.trim());
+
+        console.log("Setting alarm with period:", periodInMinutes);
+        chrome.alarms.create('fetchAndPost', {periodInMinutes: periodInMinutes}, function (alarm) {
+            console.log("Alarm created", alarm);
+        });
     });
 
 async function isServerReachable(url) {
@@ -28,8 +33,8 @@ async function isServerReachable(url) {
 
 async function fetchTokenAndPostUrls() {
     chrome.tabs.query({active: true, currentWindow: true}, async (tabs) => {
-        const tab = tabs[0]; // There will be only one active tab in the current window
-        if (tab.status === 'complete') {
+        const tab = tabs[0]; //only detecting the active tab
+        if (tab && tab.status === 'complete') {
             urlLog.push(getBaseUrl(tab.url));
         }
 
@@ -69,11 +74,8 @@ async function fetchTokenAndPostUrls() {
     });
 }
 
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.alarms.create('fetchAndPost', { periodInMinutes: periodInMinutes || 1 });
-});
-
-chrome.alarms.onAlarm.addListener((alarm) => {
+chrome.alarms.onAlarm.addListener(function (alarm) {
+    console.log("Alarm fired!", alarm);
     if (alarm.name === 'fetchAndPost') {
         fetchTokenAndPostUrls();
     }

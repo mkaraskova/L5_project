@@ -250,17 +250,14 @@ def add_person():
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zipf:
-        # add plugin files
+        # add app files
         for file in os.listdir('eMood_app/eMood_plugin'):
             file_path = os.path.join('eMood_app/eMood_plugin', file)
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_plugin_{name}", file))
 
-        with open('eMood_app/eMood_detector/settings.json', 'w') as settings_file:
-            json.dump({
-                'userId': user_id,
-                'detection_time': monitor_time
-            }, settings_file)
+        data = json.dumps({"user_id": user_id, "monitor_time": monitor_time})
+        zipf.writestr(f"eMood_plugin_{name}/userid.json", data.encode('utf-8'))
 
         # add plugin files
         for file in os.listdir('eMood_app/eMood_detector'):
@@ -269,7 +266,7 @@ def add_person():
                 zipf.write(file_path, arcname=os.path.join(f"eMood_detector_{name}", file))
 
         # Add userid and monitor time to plugin
-        zipf.writestr(f"eMood_plugin_{name}/userid.txt", f"{user_id}\n{monitor}".encode('utf-8'))
+        zipf.writestr(f"eMood_plugin_{name}/userid.txt", f"{user_id}\n{monitor_time}".encode('utf-8'))
 
     # Reset the buffer position to the beginning
     zip_buffer.seek(0)

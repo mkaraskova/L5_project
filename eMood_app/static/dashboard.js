@@ -115,7 +115,7 @@ function displayUserData(userData) {
         let moods = userData.moods.map(m => m.mood);
         const mostFrequentMood = findMostFrequent(moods);
         let webpages = userData.webpages.map(w => w.urls);
-        let mostFrequentWebsite = findMostFrequent(webpages);
+        let mostFrequentWebsite = 'http://' + findMostFrequent(webpages);
 
         var userImage = $('<img>').attr('src', '/static/images/profile.png').css({
             'max-width': '200px',
