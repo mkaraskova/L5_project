@@ -1,1 +1,4 @@
-{"userId": "4fb4e0e5-ddf6-4c65-a1b6-7afb35934df9", "mongoConnection": "mongodb+srv://martinakarask:MK9954154287@emood.jn7weuf.mongodb.net/?retryWrites=true&w=majority"}
+{
+  "userId": "4fb4e0e5-ddf6-4c65-a1b6-7afb35934df9",
+  "detection_time": 2
+}

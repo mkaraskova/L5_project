@@ -242,7 +242,7 @@ def delete_person():
 @app.route('/add-person', methods=["POST"])
 def add_person():
     name = request.form.get('name')
-    monitor = request.form.get('monitor')
+    monitor_time = request.form.get('monitor')
     user_id = str(uuid.uuid4())
     creator = current_user.email
 
@@ -256,12 +256,10 @@ def add_person():
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_plugin_{name}", file))
 
-        mongo_connection = os.getenv('MONGO_DB')
-
         with open('eMood_app/eMood_detector/settings.json', 'w') as settings_file:
             json.dump({
                 'userId': user_id,
-                'mongoConnection': mongo_connection
+                'detection_time': monitor_time
             }, settings_file)
 
         # add plugin files

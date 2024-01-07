@@ -58,6 +58,6 @@ if __name__ == '__main__':
     with open(settings_path, 'r') as file:
         settings = json.load(file)
     user_id = settings['userId']
-    server = settings['server']
+    server = settings.get('server') or 'http://localhost:4000/mood'
     detection_time = settings['detection_time']
     detect_emotion(user_id, detection_time, server)
