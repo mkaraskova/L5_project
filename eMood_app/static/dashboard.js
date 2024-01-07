@@ -1,4 +1,13 @@
 let selectedUser = null;
+let moodChart;
+moodColors = {
+    "happy": {'backgroundColor': 'rgba(255, 255, 0, 0.2)', 'borderColor': 'rgba(255, 255, 0, 1)'},   // Yellow
+    "sad": {'backgroundColor': 'rgba(0, 0, 255, 0.2)', 'borderColor': 'rgba(0, 0, 255, 1)'},         // Blue
+    "angry": {'backgroundColor': 'rgba(255, 0, 0, 0.2)', 'borderColor': 'rgba(255, 0, 0, 1)'},       // Red
+    "fear": {'backgroundColor': 'rgba(0, 255, 0, 0.2)', 'borderColor': 'rgba(0, 255, 0, 1)'},        // Green
+    "surprise": {'backgroundColor': 'rgba(128, 0, 128, 0.2)', 'borderColor': 'rgba(128, 0, 128, 1)'}, // Purple
+    "neutral": {'backgroundColor': 'rgba(255, 165, 0, 0.2)', 'borderColor': 'rgba(255, 165, 0, 1)'},  // Orange
+}
 $(document).ready(function () {
     displayUserData();
     $('button.btn.btn-secondary').on('click', function (e) {
@@ -88,13 +97,19 @@ function findMostFrequent(arr) {
     return mostFrequentItem;
 }
 
+
 function displayUserData(userData) {
     // Clear old data
     $('#deleteUser').empty();
     $('#selectedUserPicture').empty();
     $('#selectedUserInfo').empty();
-    $('#selectedUserMoods').empty();
-    $('#selectedUserWebsites').empty();
+
+    $('#moodPieChartHeading').empty();
+    $('#userWebsitesHeading').empty();
+
+    if (moodChart) {
+        moodChart.destroy();
+    }
 
     if (!userData) {
         $('#noUserSelected').append('<em><p style=\"color:gray;\">No user selected</p></em>');
@@ -107,9 +122,36 @@ function displayUserData(userData) {
             webpageList.append('<li>URL: ' + webpage.urls + '</li>');
         });
 
-        var moodList = $('<ul>');
-        userData.moods.forEach(function (m) {
-            moodList.append('<li>Mood: ' + m.mood + '</li>');
+        var ctx = document.getElementById('moodPieChart').getContext('2d');
+        let moodData = {};
+        userData.moods.forEach(m => {
+            moodData[m.mood] = (moodData[m.mood] + 1) || 1;
+        });
+        let moodBackgroundColors = [];
+        let moodBorderColors = [];
+        for (let mood in moodData) {
+            if (moodColors[mood]) {
+                moodBackgroundColors.push(moodColors[mood]['backgroundColor']);
+                moodBorderColors.push(moodColors[mood]['borderColor']);
+            } else {
+                console.log(`Undefined Mood:${mood}`);
+            }
+        }
+        var data = {
+            labels: Object.keys(moodData),
+            datasets: [{
+                data: Object.values(moodData),
+                backgroundColor: moodBackgroundColors,
+                borderColor: moodBorderColors,
+                borderWidth: 1
+            }]
+        };
+        console.log(moodData);
+        console.log(moodBackgroundColors);
+        console.log(moodBorderColors);
+        moodChart = new Chart(ctx, {
+            type: 'pie',
+            data: data,
         });
 
         let moods = userData.moods.map(m => m.mood);
@@ -134,7 +176,7 @@ function displayUserData(userData) {
         $('#selectedUserInfo').append('<p><strong>Most frequent mood:</strong>  ' + mostFrequentMood + '</p>');
         $('#selectedUserInfo').append(`<p><strong>Most visited website:</strong> <a href="${mostFrequentWebsite}" target="_blank">${mostFrequentWebsite}</a></p>`);
 
-        $('#selectedUserMoods').append('<p>User Moods:</p>').append(moodList);
-        $('#selectedUserWebsites').append('<p>User Visited pages:</p>').append(webpageList);
+        $('#moodPieChartHeading').append('Mood Overview')
+        $('#userWebsitesHeading').append('Website Overview')
     }
 }

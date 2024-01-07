@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js"></script>
 
 </head>
@@ -112,13 +113,12 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div id="selectedUserMoods" class="col">
-                        <!-- Insert your content here -->
+                    <div class="col-6">
+                        <h3 id="moodPieChartHeading" class="text-center"></h3>
+                        <canvas id="moodPieChart"></canvas>
                     </div>
-                    <div id="selectedUserWebsites" class="col">
-                        <!-- Insert your content here -->
-                    </div>
-                    <div class="col">
+                    <div class="col-6">
+                        <h3 id="userWebsitesHeading" class="text-center"></h3>
                         <!-- Insert your content here -->
                     </div>
                 </div>
