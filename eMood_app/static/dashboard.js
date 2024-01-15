@@ -2,6 +2,7 @@ let selectedUser = null;
 let moodChart;
 let webpageBarChart;
 let calendar;
+
 moodColors = {
     "happy": {'backgroundColor': 'rgba(255, 255, 0, 0.2)', 'borderColor': 'rgba(255, 255, 0, 1)'},   // Yellow
     "sad": {'backgroundColor': 'rgba(0, 0, 255, 0.2)', 'borderColor': 'rgba(0, 0, 255, 1)'},         // Blue
@@ -12,7 +13,7 @@ moodColors = {
 }
 $(document).ready(function () {
     displayUserData();
-    $('button.btn.btn-secondary').on('click', function (e) {
+    $('button.btn.refresh-btn').on('click', function (e) {
         location.reload();
     });
     $('#addPersonForm').on('submit', function (e) {
@@ -99,6 +100,62 @@ function findMostFrequent(arr) {
     return mostFrequentItem;
 }
 
+function fetchDataForDate(selectedDate, userData) {
+    let dataForDate = {
+        pieData: {labels: [], datasets: []},
+        barData: {labels: [], datasets: []}
+    };
+
+    let moodDataForDate = {};
+    moodDataForDate[selectedDate] = [];
+    userData.moods.forEach(mood => {
+        let date = new Date(mood.timestamp);
+        let formattedMoodDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        if (formattedMoodDate == selectedDate) {
+            moodDataForDate[selectedDate].push(mood.mood);
+        }
+    });
+
+    let pieData = {};
+    moodDataForDate[selectedDate].forEach(m => {
+        pieData[m] = (pieData[m] + 1) || 1;
+    });
+    let pieBackgroundColors = [];
+    let pieBorderColors = [];
+    for (let mood in pieData) {
+        if (moodColors[mood]) {
+            pieBackgroundColors.push(moodColors[mood]['backgroundColor']);
+            pieBorderColors.push(moodColors[mood]['borderColor']);
+        } else {
+            console.log(`Undefined Mood:${mood}`);
+        }
+    }
+    dataForDate.pieData.labels = Object.keys(pieData);
+    dataForDate.pieData.datasets.push({data: Object.values(pieData), backgroundColor: pieBackgroundColors});
+
+    let webPageDataForDate = {};
+    webPageDataForDate[selectedDate] = [];
+    userData.webpages.forEach(web => {
+        let date = new Date(web.timestamp);
+        let formattedWebDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+        if (formattedWebDate == selectedDate) {
+            webPageDataForDate[selectedDate].push(web.urls);
+        }
+    });
+
+    let barData = {};
+    webPageDataForDate[selectedDate].forEach(w => {
+        barData[w] = (barData[w] + 1) || 1;
+    });
+    dataForDate.barData.labels = Object.keys(barData);
+
+    dataForDate.barData.datasets.push({data: barData, label: 'Webpage frequency', backgroundColor: '#B89BC7'});
+
+    return dataForDate;
+}
+
 function displayUserData(userData) {
     // Clear old data
     $('#deleteUser').empty();
@@ -123,9 +180,8 @@ function displayUserData(userData) {
 
         // mood Pie Chart
         {
-            var ctx = document.getElementById('moodPieChart').getContext('2d');
-
             let moodData = {};
+            var ctx = document.getElementById('moodPieChart').getContext('2d');
             userData.moods.forEach(m => {
                 moodData[m.mood] = (moodData[m.mood] + 1) || 1;
             });
@@ -197,72 +253,93 @@ function displayUserData(userData) {
             });
         }
 
-
         let moods = userData.moods.map(m => m.mood);
         const mostFrequentMood = findMostFrequent(moods);
         let webpages = userData.webpages.map(w => w.urls);
         let mostFrequentWebsite = 'http://' + findMostFrequent(webpages);
+        let CalendarPieChart = null;
+        let CalendarBarChart = null;
 
-        var userImage = $('<img>').attr('src', '/static/images/profile.png').css({
-            'max-width': '200px',
-            'max-height': '200px'
-        }).addClass('img-fluid');
-        var deleteUser = $('<button class="transparent-button">').html('<img src="/static/images/bin.png" style="max-width: 30px; max-heigth: 30px;">').addClass('img-fluid');
-        deleteUser.click(function () {
-            $('#deletePersonModal').modal('show');
-        });
+        // calendar
+        {
+            var userImage = $('<img>').attr('src', '/static/images/profile.png').css({
+                'max-width': '200px',
+                'max-height': '200px'
+            }).addClass('img-fluid');
+            var deleteUser = $('<button class="transparent-button">').html('<img src="/static/images/bin.png" style="max-width: 30px; max-heigth: 30px;">').addClass('img-fluid');
+            deleteUser.click(function () {
+                $('#deletePersonModal').modal('show');
+            });
 
-        let dailyMoods = {};
-        // Group moods by date
-        let moodsByDate = {};
-        userData.moods.forEach(moodData => {
-            // Extract the date part from the timestamp
-            let date = new Date(moodData.timestamp);
-            let formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+            let dailyMoods = {};
+            let moodsByDate = {};
+            userData.moods.forEach(moodData => {
+                let date = new Date(moodData.timestamp);
+                let formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
-            if (moodsByDate[formattedDate]) {
-                moodsByDate[formattedDate].push(moodData.mood);
-            } else {
-                moodsByDate[formattedDate] = [moodData.mood];
+                if (moodsByDate[formattedDate]) {
+                    moodsByDate[formattedDate].push(moodData.mood);
+                } else {
+                    moodsByDate[formattedDate] = [moodData.mood];
+                }
+            });
+
+            for (let date in moodsByDate) {
+                dailyMoods[date] = findMostFrequent(moodsByDate[date]);
             }
-        });
 
-        // For each date, find the most frequent mood and save it to dailyMoods
-        for (let date in moodsByDate) {
-            dailyMoods[date] = findMostFrequent(moodsByDate[date]);
+            var calendarEl = document.getElementById('calendar');
+
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                firstDay: 1,
+                height: 'auto',
+                initialView: 'dayGridMonth',
+                dayMaxEventRows: true,
+                events: Object.keys(dailyMoods).map((date) => ({
+                    title: dailyMoods[date],
+                    start: date,
+                    allDay: true,
+                    color: moodColors[dailyMoods[date]].backgroundColor,
+                    display: 'background',
+                    overlap: false,
+                    textColor: 'black'
+                })),
+                eventContent: function (arg) {
+                    var arrayOfDomNodes = []
+                    var el = document.createElement('div');
+                    el.innerHTML = arg.event.title;
+                    el.style.lineHeight = 'normal'; // Set back to normal
+                    el.style.height = '100%';
+                    el.style.display = 'flex';
+                    el.style.justifyContent = 'center';
+                    el.style.alignItems = 'center';
+                    arrayOfDomNodes.push(el);
+                    return {domNodes: arrayOfDomNodes};
+                },
+                dateClick: function (info) {
+                    let dateClicked = info.dateStr;
+                    let myData = fetchDataForDate(dateClicked, userData);
+
+                    if (CalendarPieChart != null) CalendarPieChart.destroy();
+                    let pieCtx = document.getElementById('dailyMoodPieChart').getContext('2d');
+                    CalendarPieChart = new Chart(pieCtx, {
+                        type: 'pie',
+                        data: myData.pieData, // Replace with appropriate data
+                    });
+
+                    if (CalendarBarChart != null) CalendarBarChart.destroy();
+                    let barCtx = document.getElementById('dailyWebPageBarChart').getContext('2d');
+                    CalendarBarChart = new Chart(barCtx, {
+                        type: 'bar',
+                        data: myData.barData, // Replace with appropriate data
+                    });
+
+                    $("#calendarModal").modal('show');
+                }
+            });
+
+            calendar.render();
         }
-
-        var calendarEl = document.getElementById('calendar');
-
-        var calendar = new FullCalendar.Calendar(calendarEl, {
-            firstDay: 1,
-            height: 'auto',
-            initialView: 'dayGridMonth',
-            dayMaxEventRows: true,
-            events: Object.keys(dailyMoods).map((date) => ({
-                title: dailyMoods[date],
-                start: date,
-                allDay: true,
-                color: moodColors[dailyMoods[date]].backgroundColor,
-                display: 'background',
-                overlap: false,
-                textColor: 'black'
-            })),
-            eventContent: function (arg) {
-                var arrayOfDomNodes = []
-                var el = document.createElement('div');
-                el.innerHTML = arg.event.title;
-                el.style.lineHeight = 'normal'; // Set back to normal
-                el.style.height = '100%';
-                el.style.display = 'flex';
-                el.style.justifyContent = 'center';
-                el.style.alignItems = 'center';
-                arrayOfDomNodes.push(el);
-                return {domNodes: arrayOfDomNodes};
-            },
-        });
-
-        calendar.render();
 
         $('#deleteUser').append(deleteUser);
         $('#selectedUserPicture').append(userImage);

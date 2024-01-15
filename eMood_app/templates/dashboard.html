@@ -5,7 +5,7 @@
     <link rel="stylesheet" href="/static/style.css">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
-    <link href='https://unpkg.com/fullcalendar@5/main.min.css' rel='stylesheet' />
+    <link href='https://unpkg.com/fullcalendar@5/main.min.css' rel='stylesheet'/>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/popper.js@1.12.9/dist/umd/popper.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -47,7 +47,7 @@
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Add</button>
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="button" class="btn btn-secondary refresh-btn" data-dismiss="modal">Close</button>
                     </div>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 </form>
@@ -66,11 +66,38 @@
                         <p style="text-align: center">Would you like to permanently delete this monitored user?</p>
                     </div>
                     <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                        <button type="button" class="btn btn-secondary refresh-btn" data-dismiss="modal">Cancel</button>
                         <button type="submit" class="btn btn-primary">Yes, delete user</button>
                     </div>
                     <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                 </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Your Modal -->
+    <div id="calendarModal" class="modal" tabindex="-1">
+        <div class="modal-dialog modal-xl">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title text-center">Details for selected day</h4>
+                </div>
+                <div class="modal-body">
+                    <!-- Put your charts here -->
+                    <div class="row">
+                        <div class="col-12 col-md-6 justify-content-center">
+                            <canvas id="dailyMoodPieChart" width="300" height="300"></canvas>
+                        </div>
+                        <div class="col-12 col-md-6 justify-content-center">
+                            <canvas id="dailyWebPageBarChart" width="300" height="300"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+
             </div>
         </div>
     </div>
