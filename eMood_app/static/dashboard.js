@@ -148,12 +148,19 @@ function displayUserData(userData) {
                     borderWidth: 1
                 }]
             };
-            console.log(moodData);
-            console.log(moodBackgroundColors);
-            console.log(moodBorderColors);
+
             moodChart = new Chart(ctx, {
                 type: 'pie',
                 data: data,
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'right'
+                        }
+                    }
+                }
             });
         }
 
