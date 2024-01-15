@@ -295,6 +295,7 @@ function displayUserData(userData) {
                 height: 'auto',
                 initialView: 'dayGridMonth',
                 dayMaxEventRows: true,
+                dayCellClassNames: ['calendarButtonClass'],
                 events: Object.keys(dailyMoods).map((date) => ({
                     title: dailyMoods[date],
                     start: date,
@@ -324,14 +325,45 @@ function displayUserData(userData) {
                     let pieCtx = document.getElementById('dailyMoodPieChart').getContext('2d');
                     CalendarPieChart = new Chart(pieCtx, {
                         type: 'pie',
-                        data: myData.pieData, // Replace with appropriate data
+                        data: myData.pieData,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Mood Day Overview',
+                                    font: {
+                                        size: 20
+                                    }
+                                },
+                                legend: {
+                                    display: true,
+                                    position: 'right'
+                                }
+                            }
+                        }
                     });
 
                     if (CalendarBarChart != null) CalendarBarChart.destroy();
                     let barCtx = document.getElementById('dailyWebPageBarChart').getContext('2d');
                     CalendarBarChart = new Chart(barCtx, {
                         type: 'bar',
-                        data: myData.barData, // Replace with appropriate data
+                        data: myData.barData,
+                        options: {
+                            responsive: true,
+                            plugins: {
+                                title: {
+                                    display: true,
+                                    text: 'Website Day Overview',
+                                    font: {
+                                        size: 20
+                                    }
+                                },
+                                legend: {
+                                    display: true
+                                }
+                            }
+                        }
                     });
 
                     $("#calendarModal").modal('show');
@@ -349,7 +381,7 @@ function displayUserData(userData) {
         $('#selectedUserInfo').append('<p><strong>Most frequent mood:</strong>  ' + mostFrequentMood + '</p>');
         $('#selectedUserInfo').append(`<p><strong>Most visited website:</strong> <a href="${mostFrequentWebsite}" target="_blank">${mostFrequentWebsite}</a></p>`);
 
-        $('#moodPieChartHeading').append('Mood Overview')
-        $('#userWebsitesHeading').append('Website Overview')
+        $('#moodPieChartHeading').append('Mood Overview');
+        $('#userWebsitesHeading').append('Website Overview');
     }
 }

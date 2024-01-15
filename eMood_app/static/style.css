@@ -94,6 +94,10 @@ main {
     opacity: 1 !important;
 }
 
+.fc-day.calendarButtonClass:hover {
+    background-color: #eeeeee;
+}
+
 .happy { background-color: yellow; }
 .sad { background-color: blue; }
 .angry { background-color: red; }
