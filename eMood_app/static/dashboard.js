@@ -1,6 +1,7 @@
 let selectedUser = null;
 let moodChart;
 let webpageBarChart;
+let calendar;
 moodColors = {
     "happy": {'backgroundColor': 'rgba(255, 255, 0, 0.2)', 'borderColor': 'rgba(255, 255, 0, 1)'},   // Yellow
     "sad": {'backgroundColor': 'rgba(0, 0, 255, 0.2)', 'borderColor': 'rgba(0, 0, 255, 1)'},         // Blue
@@ -97,7 +98,6 @@ function findMostFrequent(arr) {
 
     return mostFrequentItem;
 }
-
 
 function displayUserData(userData) {
     // Clear old data
@@ -204,6 +204,58 @@ function displayUserData(userData) {
         deleteUser.click(function () {
             $('#deletePersonModal').modal('show');
         });
+
+        let dailyMoods = {};
+        // Group moods by date
+        let moodsByDate = {};
+        userData.moods.forEach(moodData => {
+            // Extract the date part from the timestamp
+            let date = new Date(moodData.timestamp);
+            let formattedDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+
+            if (moodsByDate[formattedDate]) {
+                moodsByDate[formattedDate].push(moodData.mood);
+            } else {
+                moodsByDate[formattedDate] = [moodData.mood];
+            }
+        });
+
+        // For each date, find the most frequent mood and save it to dailyMoods
+        for (let date in moodsByDate) {
+            dailyMoods[date] = findMostFrequent(moodsByDate[date]);
+        }
+
+        var calendarEl = document.getElementById('calendar');
+
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+            firstDay: 1,
+            height: 'auto',
+            initialView: 'dayGridMonth',
+            dayMaxEventRows: true,
+            events: Object.keys(dailyMoods).map((date) => ({
+                title: dailyMoods[date],
+                start: date,
+                allDay: true,
+                color: moodColors[dailyMoods[date]].backgroundColor,
+                display: 'background',
+                overlap: false,
+                textColor: 'black'
+            })),
+            eventContent: function (arg) {
+                var arrayOfDomNodes = []
+                var el = document.createElement('div');
+                el.innerHTML = arg.event.title;
+                el.style.lineHeight = 'normal'; // Set back to normal
+                el.style.height = '100%';
+                el.style.display = 'flex';
+                el.style.justifyContent = 'center';
+                el.style.alignItems = 'center';
+                arrayOfDomNodes.push(el);
+                return {domNodes: arrayOfDomNodes};
+            },
+        });
+
+        calendar.render();
 
         $('#deleteUser').append(deleteUser);
         $('#selectedUserPicture').append(userImage);

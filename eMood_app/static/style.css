@@ -84,3 +84,19 @@ main {
     max-height: 100%;
     color: black;
 }
+
+.fc-button-primary {
+    background-color: #B89BC7 !important;
+    border-color: #B29BC7 !important;
+}
+
+.fc-daygrid .fc-bg-event {
+    opacity: 1 !important;
+}
+
+.happy { background-color: yellow; }
+.sad { background-color: blue; }
+.angry { background-color: red; }
+.fear { background-color: green; }
+.surprise {background-color: purple;}
+.neutral { background-color: orange; }

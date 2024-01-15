@@ -8,6 +8,21 @@ import requests
 
 
 s = requests.Session()
+server_status = False
+moods = []
+
+
+def check_server(server):
+    global server_status
+    try:
+        response = s.get(server)
+        if response.status_code == 200:
+            server_status = True
+        else:
+            server_status = False
+    except requests.exceptions.ConnectionError:
+        server_status = False
+    return server_status
 
 
 def fetch_csrf_token(server_url):
@@ -19,24 +34,38 @@ def fetch_csrf_token(server_url):
 
 
 def send_to_server(user_id, server, emotion, confidence):
-    mood_server = server + '/mood'
-    csrf_server = server + '/get-csrf-token'
-    token = fetch_csrf_token(csrf_server)
+    global server_status
+    global moods
 
-    headers = {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': token}
-    data = {
-        'userId': user_id,
-        'mood': emotion,
-        'confidence': confidence
-    }
-    response = s.post(mood_server, json=data, headers=headers)
-    if response.status_code == 200:
-        print(f"Mood data sent to the server: {response.text}")
+    if check_server(server):
+        moods.append({
+            'userId': user_id,
+            'mood': emotion,
+            'confidence': confidence
+        })
+
+        for mood in moods:
+            mood_server = server + '/mood'
+            csrf_server = server + '/get-csrf-token'
+            token = fetch_csrf_token(csrf_server)
+
+            headers = {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': token}
+
+            response = s.post(mood_server, json=mood, headers=headers)
+            if response.status_code == 200:
+                print(f"Mood data sent to the server: {response.text}")
+                moods.remove(mood)
+            else:
+                print(f"Failed to send mood data: {response.text}")
+                break
     else:
-        print(f"Failed to send mood data: {response.text}")
-
+        moods.append({
+            'userId': user_id,
+            'mood': emotion,
+            'confidence': confidence
+        })
 
 def detect_emotion(user_id, detection_time, server):
     webcam_fps = 30
