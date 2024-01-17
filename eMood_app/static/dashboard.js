@@ -395,12 +395,25 @@ function displayUserData(userData) {
                     });
                     console.log(new Date(info.dateStr));
                     var dayCalendar = document.getElementById('dayCalendar');
+                    let startTimes = calendarData.timelineData.map(e => new Date(e.start)).filter(date => !isNaN(date));
+
+                    let minStartTime = new Date(Math.min(...startTimes)).toISOString().slice(11, 19);
+                    let maxEndTime = new Date(Math.max(...startTimes)).toISOString().slice(11, 19);
                     var timelineCalendar = new FullCalendar.Calendar(dayCalendar, {
                         initialView: 'timeGridDay',
+                        initialDate: new Date(info.dateStr),
                         height: 'auto',
+                        headerToolbar: false,
+                        slotMinTime: minStartTime,
+                        slotMaxTime: maxEndTime,
+                        slotDuration: '00:05:00',
                         events: calendarData.timelineData,
+                        defaultTimedEventDuration: '00:00:01',
+                        displayEventTime: false,
+                        eventClassNames: 'event-width',
                     });
                     $("#calendarModal").modal('show');
+
                     timelineCalendar.render();
 
                 }
