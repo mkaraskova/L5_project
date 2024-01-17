@@ -103,17 +103,21 @@ function findMostFrequent(arr) {
 function fetchDataForDate(selectedDate, userData) {
     let dataForDate = {
         pieData: {labels: [], datasets: []},
-        barData: {labels: [], datasets: []}
+        barData: {labels: [], datasets: []},
+        timelineData: []
     };
 
     let moodDataForDate = {};
+    let timelineMoodDataForDate = {};
     moodDataForDate[selectedDate] = [];
+    timelineMoodDataForDate[selectedDate] = [];
     userData.moods.forEach(mood => {
         let date = new Date(mood.timestamp);
         let formattedMoodDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
         if (formattedMoodDate == selectedDate) {
             moodDataForDate[selectedDate].push(mood.mood);
+            timelineMoodDataForDate[selectedDate].push(mood);
         }
     });
 
@@ -135,13 +139,16 @@ function fetchDataForDate(selectedDate, userData) {
     dataForDate.pieData.datasets.push({data: Object.values(pieData), backgroundColor: pieBackgroundColors});
 
     let webPageDataForDate = {};
+    let timelineWebPageDataForDate = {};
     webPageDataForDate[selectedDate] = [];
+    timelineWebPageDataForDate[selectedDate] = [];
     userData.webpages.forEach(web => {
         let date = new Date(web.timestamp);
         let formattedWebDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
         if (formattedWebDate == selectedDate) {
             webPageDataForDate[selectedDate].push(web.urls);
+            timelineWebPageDataForDate[selectedDate].push(web);
         }
     });
 
@@ -153,6 +160,26 @@ function fetchDataForDate(selectedDate, userData) {
 
     dataForDate.barData.datasets.push({data: barData, label: 'Webpage frequency', backgroundColor: '#B89BC7'});
 
+    // Convert moods data into timeline items
+    let moodItems = timelineMoodDataForDate[selectedDate].map((moodRecord) => {
+        let moodDate = new Date(moodRecord.timestamp)
+        return {
+            start: moodDate,
+            title: moodRecord.mood
+        };
+    });
+
+    // Convert webpage data into timeline items
+    let webpageItems = timelineWebPageDataForDate[selectedDate].map((webRecord) => {
+        let webpageDate = new Date(webRecord.timestamp)
+        return {
+            start: webpageDate,
+            title: webRecord.urls,
+        };
+    });
+
+    dataForDate.timelineData = [...moodItems, ...webpageItems]
+    console.log(dataForDate.timelineData)
     return dataForDate;
 }
 
@@ -259,6 +286,7 @@ function displayUserData(userData) {
         let mostFrequentWebsite = 'http://' + findMostFrequent(webpages);
         let CalendarPieChart = null;
         let CalendarBarChart = null;
+        let CalendarTimeline = null;
 
         // calendar
         {
@@ -319,13 +347,13 @@ function displayUserData(userData) {
                 },
                 dateClick: function (info) {
                     let dateClicked = info.dateStr;
-                    let myData = fetchDataForDate(dateClicked, userData);
+                    let calendarData = fetchDataForDate(dateClicked, userData);
 
                     if (CalendarPieChart != null) CalendarPieChart.destroy();
                     let pieCtx = document.getElementById('dailyMoodPieChart').getContext('2d');
                     CalendarPieChart = new Chart(pieCtx, {
                         type: 'pie',
-                        data: myData.pieData,
+                        data: calendarData.pieData,
                         options: {
                             responsive: true,
                             plugins: {
@@ -348,7 +376,7 @@ function displayUserData(userData) {
                     let barCtx = document.getElementById('dailyWebPageBarChart').getContext('2d');
                     CalendarBarChart = new Chart(barCtx, {
                         type: 'bar',
-                        data: myData.barData,
+                        data: calendarData.barData,
                         options: {
                             responsive: true,
                             plugins: {
@@ -365,8 +393,16 @@ function displayUserData(userData) {
                             }
                         }
                     });
-
+                    console.log(new Date(info.dateStr));
+                    var dayCalendar = document.getElementById('dayCalendar');
+                    var timelineCalendar = new FullCalendar.Calendar(dayCalendar, {
+                        initialView: 'timeGridDay',
+                        height: 'auto',
+                        events: calendarData.timelineData,
+                    });
                     $("#calendarModal").modal('show');
+                    timelineCalendar.render();
+
                 }
             });
 

@@ -2,9 +2,11 @@
     background-color: #B89BC7 !important;
     max-height: 70px;
 }
+
 .spaced {
-  margin-right: 20px;
+    margin-right: 20px;
 }
+
 #logo {
     width: 100px;
     height: 100px;
@@ -12,6 +14,7 @@
     margin-top: -20px;
     margin-bottom: -20px;
 }
+
 body {
     display: flex;
     flex-direction: column;
@@ -52,14 +55,17 @@ main {
     bottom: 0;
     left: 0;
     width: 100%;
-    background-color:#B89BC7 !important;
+    background-color: #B89BC7 !important;
 }
+
 .stick {
-  position: fixed !important;;
+    position: fixed !important;;
 }
+
 .highlight-text {
     color: #B89BC7 !important;
 }
+
 .gradient-custom {
     /* fallback for old browsers */
     background: #B89BC7;
@@ -68,7 +74,7 @@ main {
     background: -webkit-linear-gradient(to right bottom, rgb(187, 164, 201), rgb(99, 21, 148));
 
     /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
-    background: linear-gradient(to right bottom,rgb(187, 164, 201),  rgb(99, 21, 148))
+    background: linear-gradient(to right bottom, rgb(187, 164, 201), rgb(99, 21, 148))
 }
 
 .avatar {
@@ -98,9 +104,26 @@ main {
     background-color: #eeeeee;
 }
 
-.happy { background-color: yellow; }
-.sad { background-color: blue; }
-.angry { background-color: red; }
-.fear { background-color: green; }
-.surprise {background-color: purple;}
-.neutral { background-color: orange; }
+.happy {
+    background-color: yellow;
+}
+
+.sad {
+    background-color: blue;
+}
+
+.angry {
+    background-color: red;
+}
+
+.fear {
+    background-color: green;
+}
+
+.surprise {
+    background-color: purple;
+}
+
+.neutral {
+    background-color: orange;
+}
