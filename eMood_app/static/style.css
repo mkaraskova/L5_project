@@ -103,10 +103,20 @@ main {
 .fc-day.calendarButtonClass:hover {
     background-color: #eeeeee;
 }
+.fc-day-today {
+    background-color: inherit !important;
+    border: none !important;
+}
 
 .event-style {
     font-size: 14px;
-    height: 30px;
+    height: 40px;
+    font-size: 20px;
+    color: black !important;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .happy {

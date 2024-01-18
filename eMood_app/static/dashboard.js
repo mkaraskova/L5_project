@@ -11,6 +11,15 @@ moodColors = {
     "surprise": {'backgroundColor': 'rgba(128, 0, 128, 0.2)', 'borderColor': 'rgba(128, 0, 128, 1)'}, // Purple
     "neutral": {'backgroundColor': 'rgba(255, 165, 0, 0.2)', 'borderColor': 'rgba(255, 165, 0, 1)'},  // Orange
 }
+
+moodCalendarColors = {
+    "happy": '#fdffb6',         // Yellow
+    "sad": '#a0c4ff',           // Blue
+    "angry": '#ffadad',         // Red
+    "fear": '#caffbf',          // Green
+    "surprise": '#e2afff',      // Purple
+    "neutral": '#ffd6a5'        // Orange
+}
 $(document).ready(function () {
     displayUserData();
     $('button.btn.refresh-btn').on('click', function (e) {
@@ -104,7 +113,7 @@ function fetchDataForDate(selectedDate, userData) {
     let dataForDate = {
         pieData: {labels: [], datasets: []},
         barData: {labels: [], datasets: []},
-        timelineData: []
+        timelineData: {moodData: [], webIData: []}
     };
 
     let moodDataForDate = {};
@@ -166,7 +175,7 @@ function fetchDataForDate(selectedDate, userData) {
         return {
             start: moodDate,
             title: moodRecord.mood,
-            color: moodColors[moodRecord.mood].backgroundColor
+            color: moodCalendarColors[moodRecord.mood]
         };
     });
 
@@ -180,7 +189,8 @@ function fetchDataForDate(selectedDate, userData) {
         };
     });
 
-    dataForDate.timelineData = [...moodItems, ...webpageItems]
+    dataForDate.timelineData.moodData = [...moodItems]
+    dataForDate.timelineData.webData = [...webpageItems]
     console.log(dataForDate.timelineData)
     return dataForDate;
 }
@@ -396,37 +406,71 @@ function displayUserData(userData) {
                         }
                     });
                     console.log(new Date(info.dateStr));
-                    var dayCalendar = document.getElementById('dayCalendar');
-                    let startTimes = calendarData.timelineData.map(e => new Date(e.start)).filter(date => !isNaN(date));
+                    var dayMoodCalendar = document.getElementById('dayMoodCalendar');
+                    var dayWebCalendar = document.getElementById('dayWebCalendar');
+                    let startMoodTimes = calendarData.timelineData.moodData.map(e => new Date(e.start)).filter(date => !isNaN(date));
+                    let startWebTimes = calendarData.timelineData.webData.map(e => new Date(e.start)).filter(date => !isNaN(date));
 
-                    let minStart = new Date(Math.min(...startTimes))
-                    minStart.setMinutes(0);
-                    let minStartTime = minStart.toISOString().slice(11, 19);
+                    let minMoodStart = new Date(Math.min(...startMoodTimes))
+                    minMoodStart.setMinutes(0);
+                    let minStartMoodTime = minMoodStart.toISOString().slice(11, 19);
+                    let minWebStart = new Date(Math.min(...startWebTimes))
+                    minWebStart.setMinutes(0);
+                    let minStartWebTime = minWebStart.toISOString().slice(11, 19);
 
-                    let maxEnd = new Date(Math.max(...startTimes))
-                    if (maxEnd.getMinutes() > 0) {
-                        maxEnd.setHours(maxEnd.getHours() + 1);
-                    }
-                    maxEnd.setMinutes(0);
-                    let maxEndTime = maxEnd.toISOString().slice(11, 19);
+                    let maxMoodEnd = new Date(Math.max(...startMoodTimes))
+                    maxMoodEnd.setHours(maxMoodEnd.getHours() + 1);
+                    maxMoodEnd.setMinutes(0);
+                    let maxEndMoodTime = maxMoodEnd.toISOString().slice(11, 19);
+                    let maxWebEnd = new Date(Math.max(...startWebTimes))
+                    maxWebEnd.setHours(maxWebEnd.getHours() + 1);
+                    maxWebEnd.setMinutes(0);
+                    let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
 
-                    var timelineCalendar = new FullCalendar.Calendar(dayCalendar, {
+                    var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
                         initialView: 'timeGridDay',
                         initialDate: new Date(info.dateStr),
                         height: 'auto',
                         headerToolbar: false,
                         allDaySlot: false,
-                        slotMinTime: minStartTime,
-                        slotMaxTime: maxEndTime,
+                        slotMinTime: minStartMoodTime,
+                        slotMaxTime: maxEndMoodTime,
                         slotDuration: '00:05:00',
-                        events: calendarData.timelineData,
-                        defaultTimedEventDuration: '00:01:00',
+                        slotLabelInterval: '00:10:00',
+                        events: calendarData.timelineData.moodData,
+                        defaultTimedEventDuration: '00:00:01',
                         displayEventTime: false,
                         eventClassNames: 'event-style',
+                        eventOverlap: false,
+                        eventMouseEnter: function (info) {
+                            var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
+                            $(info.el).attr('title', 'Time: ' + startTime);
+                        }
+                    });
+                    var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
+                        initialView: 'timeGridDay',
+                        initialDate: new Date(info.dateStr),
+                        height: 'auto',
+                        headerToolbar: false,
+                        allDaySlot: false,
+                        slotMinTime: minStartWebTime,
+                        slotMaxTime: maxEndWebTime,
+                        slotDuration: '00:05:00',
+                        slotLabelInterval: '00:10:00',
+                        events: calendarData.timelineData.webData,
+                        defaultTimedEventDuration: '00:00:01',
+                        displayEventTime: false,
+                        eventClassNames: 'event-style',
+                        eventOverlap: false,
+                        eventMouseEnter: function (info) {
+                            var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
+                            $(info.el).attr('title', 'Time: ' + startTime);
+                        }
                     });
                     $("#calendarModal").modal('show');
 
-                    timelineCalendar.render();
+                    timelineMoodCalendar.render();
+                    timelineWebCalendar.render();
 
                 }
             });
