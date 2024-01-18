@@ -104,12 +104,9 @@ main {
     background-color: #eeeeee;
 }
 
-.event-width {
-    max-width: 150px !important;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
+.event-style {
+    font-size: 14px;
+    height: 30px;
 }
 
 .happy {

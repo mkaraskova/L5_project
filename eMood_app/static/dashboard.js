@@ -165,7 +165,8 @@ function fetchDataForDate(selectedDate, userData) {
         let moodDate = new Date(moodRecord.timestamp)
         return {
             start: moodDate,
-            title: moodRecord.mood
+            title: moodRecord.mood,
+            color: moodColors[moodRecord.mood].backgroundColor
         };
     });
 
@@ -175,6 +176,7 @@ function fetchDataForDate(selectedDate, userData) {
         return {
             start: webpageDate,
             title: webRecord.urls,
+            color: "#B89BC7",
         };
     });
 
@@ -397,20 +399,30 @@ function displayUserData(userData) {
                     var dayCalendar = document.getElementById('dayCalendar');
                     let startTimes = calendarData.timelineData.map(e => new Date(e.start)).filter(date => !isNaN(date));
 
-                    let minStartTime = new Date(Math.min(...startTimes)).toISOString().slice(11, 19);
-                    let maxEndTime = new Date(Math.max(...startTimes)).toISOString().slice(11, 19);
+                    let minStart = new Date(Math.min(...startTimes))
+                    minStart.setMinutes(0);
+                    let minStartTime = minStart.toISOString().slice(11, 19);
+
+                    let maxEnd = new Date(Math.max(...startTimes))
+                    if (maxEnd.getMinutes() > 0) {
+                        maxEnd.setHours(maxEnd.getHours() + 1);
+                    }
+                    maxEnd.setMinutes(0);
+                    let maxEndTime = maxEnd.toISOString().slice(11, 19);
+
                     var timelineCalendar = new FullCalendar.Calendar(dayCalendar, {
                         initialView: 'timeGridDay',
                         initialDate: new Date(info.dateStr),
                         height: 'auto',
                         headerToolbar: false,
+                        allDaySlot: false,
                         slotMinTime: minStartTime,
                         slotMaxTime: maxEndTime,
                         slotDuration: '00:05:00',
                         events: calendarData.timelineData,
-                        defaultTimedEventDuration: '00:00:01',
+                        defaultTimedEventDuration: '00:01:00',
                         displayEventTime: false,
-                        eventClassNames: 'event-width',
+                        eventClassNames: 'event-style',
                     });
                     $("#calendarModal").modal('show');
 
