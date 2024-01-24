@@ -2,6 +2,8 @@ let selectedUser = null;
 let moodChart;
 let webpageBarChart;
 let calendar;
+let CalendarPieChart = null;
+let CalendarBarChart = null;
 
 moodColors = {
     "happy": {'backgroundColor': 'rgba(255, 255, 0, 0.2)', 'borderColor': 'rgba(255, 255, 0, 1)'},   // Yellow
@@ -210,6 +212,12 @@ function displayUserData(userData) {
     if (webpageBarChart) {
         webpageBarChart.destroy();
     }
+    if (CalendarPieChart) {
+        CalendarPieChart.destroy();
+    }
+    if (CalendarBarChart) {
+        CalendarBarChart.destroy();
+    }
 
     if (!userData) {
         $('#noUserSelected').append('<em><p style=\"color:gray;\">No user selected</p></em>');
@@ -296,8 +304,6 @@ function displayUserData(userData) {
         const mostFrequentMood = findMostFrequent(moods);
         let webpages = userData.webpages.map(w => w.urls);
         let mostFrequentWebsite = 'http://' + findMostFrequent(webpages);
-        let CalendarPieChart = null;
-        let CalendarBarChart = null;
         let CalendarTimeline = null;
 
         // calendar
