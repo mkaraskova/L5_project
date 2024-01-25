@@ -73,7 +73,7 @@ def detect_emotion(user_id, detection_time, server):
 
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
-    frame_no = 0
+    frame_no = 1
 
     logging.info(f"Starting mood detection now...")
     while True:
