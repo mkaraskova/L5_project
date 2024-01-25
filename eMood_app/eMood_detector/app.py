@@ -16,12 +16,12 @@ emotion_messages = {
                "surprise": "Hold on to Your Hat! Surprise Mood Detected!",
                "angry": "Whoa, Take a Breath! Anger Detected...",
                "fear": "Eek! Fear Mode Activated..."},
-    "messages": {"sad": "Chin up, buttercup! A rainbow follows the rain. 🌈",
-                 "happy": "Smile wide! Your happiness is contagious. 😄",
-                 "neutral": "Staying calm and collected, like a zen master. 🧘‍♂️",
-                 "surprise": "Guess what? Life just threw you a surprise party! 🎉",
-                 "angry": "Take a deep breath and count to ten. Anger doesn't solve anything. 🌬️",
-                 "fear": "Facing fears makes you stronger. You're braver than you think! 💪"}
+    "messages": {"sad": "Chin up, buttercup! A rainbow follows the rain.",
+                 "happy": "Smile wide! Your happiness is contagious.",
+                 "neutral": "Staying calm and collected, like a zen master. ️",
+                 "surprise": "Guess what? Life just threw you a surprise party!",
+                 "angry": "Take a deep breath and count to ten. Anger doesn't solve anything.",
+                 "fear": "Facing fears makes you stronger. You're braver than you think!"}
 
 }
 
@@ -121,13 +121,12 @@ def detect_emotion(user_id, detection_time, server):
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
 
-            if emotion in emotion_messages:
-                notification.notify(
-                    title=emotion_messages['titles'][emotion],
-                    message=emotion_messages['messages'][emotion],
-                    app_icon='logo.ico',
-                    timeout=20 if emotion != "fear" else 10,
-                )
+            notification.notify(
+                title=emotion_messages['titles'][emotion],
+                message=emotion_messages['messages'][emotion],
+                app_icon='logo.ico',
+                timeout=20
+            )
 
             send_to_server(user_id, server, emotion, score)
         frame_no += 1
