@@ -1,11 +1,29 @@
 import json
-import os
-import time
-import cv2
 import logging
-from fer import FER
-import requests
+import os
+import sys
+import time
 
+import cv2
+import requests
+from fer import FER
+from plyer import notification
+
+emotion_messages = {
+    "titles": {"sad": "Uh-Oh! Sadness Detected...",
+               "happy": "Hooray! Pure Happiness Detected!",
+               "neutral": "Chillin' Like a Villain: Neutral Mood Detected️",
+               "surprise": "Hold on to Your Hat! Surprise Mood Detected!",
+               "angry": "Whoa, Take a Breath! Anger Detected...",
+               "fear": "Eek! Fear Mode Activated..."},
+    "messages": {"sad": "Chin up, buttercup! A rainbow follows the rain. 🌈",
+                 "happy": "Smile wide! Your happiness is contagious. 😄",
+                 "neutral": "Staying calm and collected, like a zen master. 🧘‍♂️",
+                 "surprise": "Guess what? Life just threw you a surprise party! 🎉",
+                 "angry": "Take a deep breath and count to ten. Anger doesn't solve anything. 🌬️",
+                 "fear": "Facing fears makes you stronger. You're braver than you think! 💪"}
+
+}
 
 s = requests.Session()
 server_status = False
@@ -67,6 +85,7 @@ def send_to_server(user_id, server, emotion, confidence):
             'confidence': confidence
         })
 
+
 def detect_emotion(user_id, detection_time, server):
     webcam_fps = 30
     frame_interval = detection_time * 60 * webcam_fps
@@ -75,7 +94,12 @@ def detect_emotion(user_id, detection_time, server):
     webcam = cv2.VideoCapture(0)
     frame_no = 1
 
-    logging.info(f"Starting mood detection now...")
+    notification.notify(
+        title='Hello',
+        message='Starting mood detection now...',
+        app_icon='logo.ico',
+        timeout=10,
+    )
     while True:
         ret, frame = webcam.read()
         if not ret:
@@ -96,6 +120,15 @@ def detect_emotion(user_id, detection_time, server):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
+
+            if emotion in emotion_messages:
+                notification.notify(
+                    title=emotion_messages['titles'][emotion],
+                    message=emotion_messages['messages'][emotion],
+                    app_icon='logo.ico',
+                    timeout=20 if emotion != "fear" else 10,
+                )
+
             send_to_server(user_id, server, emotion, score)
         frame_no += 1
 
@@ -103,10 +136,15 @@ def detect_emotion(user_id, detection_time, server):
 
 
 if __name__ == '__main__':
-    script_dir = os.path.dirname(os.path.abspath(__file__))
+    if getattr(sys, 'frozen', False):
+        script_dir = os.path.dirname(sys.executable)
+    else:
+        script_dir = os.path.dirname(os.path.abspath(__file__))
+
     settings_path = os.path.join(script_dir, 'settings.json')
     with open(settings_path, 'r') as file:
         settings = json.load(file)
+
     user_id = settings['userId']
     server = settings.get('server') or 'http://localhost:4000'
     detection_time = settings['detection_time']
