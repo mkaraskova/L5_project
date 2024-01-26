@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Tab Reporter",
+  "name": "eMood",
   "version": "1.0",
   "permissions": ["tabs", "activeTab", "alarms"],
   "background": {
