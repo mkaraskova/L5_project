@@ -94,12 +94,19 @@ def detect_emotion(user_id, detection_time, server):
     webcam = cv2.VideoCapture(0)
     frame_no = 1
 
-    notification.notify(
+    try:
+        notification.notify(
         title='Hello',
         message='Starting mood detection now...',
-        app_icon='logo.ico',
+        app_icon='icon.ico',
         timeout=10,
-    )
+        )
+    except Exception:
+        notification.notify(
+            title='Hello',
+            message='Starting mood detection now...',
+            timeout=10,
+        )
     while True:
         ret, frame = webcam.read()
         if not ret:
@@ -121,13 +128,19 @@ def detect_emotion(user_id, detection_time, server):
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
 
-            notification.notify(
-                title=emotion_messages['titles'][emotion],
-                message=emotion_messages['messages'][emotion],
-                app_icon='logo.ico',
-                timeout=20
-            )
-
+            try:
+                notification.notify(
+                    title=emotion_messages['titles'][emotion],
+                    message=emotion_messages['messages'][emotion],
+                    app_icon='icon.ico',
+                    timeout=20
+                )
+            except Exception:
+                notification.notify(
+                    title=emotion_messages['titles'][emotion],
+                    message=emotion_messages['messages'][emotion],
+                    timeout=20
+                )
             send_to_server(user_id, server, emotion, score)
         frame_no += 1
 

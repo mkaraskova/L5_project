@@ -5,19 +5,19 @@ let CalendarPieChart = null;
 let CalendarBarChart = null;
 
 moodColors = {
-    "happy": {'backgroundColor': 'rgba(255, 255, 0, 0.2)', 'borderColor': 'rgba(255, 255, 0, 1)'},   // Yellow
-    "sad": {'backgroundColor': 'rgba(0, 0, 255, 0.2)', 'borderColor': 'rgba(0, 0, 255, 1)'},         // Blue
-    "angry": {'backgroundColor': 'rgba(255, 0, 0, 0.2)', 'borderColor': 'rgba(255, 0, 0, 1)'},       // Red
-    "fear": {'backgroundColor': 'rgba(0, 255, 0, 0.2)', 'borderColor': 'rgba(0, 255, 0, 1)'},        // Green
-    "surprise": {'backgroundColor': 'rgba(128, 0, 128, 0.2)', 'borderColor': 'rgba(128, 0, 128, 1)'}, // Purple
-    "neutral": {'backgroundColor': 'rgba(255, 165, 0, 0.2)', 'borderColor': 'rgba(255, 165, 0, 1)'},  // Orange
+    "happy": {'backgroundColor': '#FFEB99', 'borderColor': 'rgba(255, 255, 0, 1)'},   // Yellow
+    "sad": {'backgroundColor': '#a0c4ff', 'borderColor': 'rgba(0, 0, 255, 1)'},         // Blue
+    "angry": {'backgroundColor': '#ffadad', 'borderColor': 'rgba(255, 0, 0, 1)'},       // Red
+    "fear": {'backgroundColor': '#DDFFBB', 'borderColor': 'rgba(0, 255, 0, 1)'},        // Green
+    "surprise": {'backgroundColor': '#e2afff', 'borderColor': 'rgba(128, 0, 128, 1)'}, // Purple
+    "neutral": {'backgroundColor': '#ffd6a5', 'borderColor': 'rgba(255, 165, 0, 1)'},  // Orange
 }
 
 moodCalendarColors = {
-    "happy": '#FFFAA0',         // Yellow
+    "happy": '#FFEB99',         // Yellow
     "sad": '#a0c4ff',           // Blue
     "angry": '#ffadad',         // Red
-    "fear": '#caffbf',          // Green
+    "fear": '#DDFFBB',          // Green
     "surprise": '#e2afff',      // Purple
     "neutral": '#ffd6a5'        // Orange
 }
@@ -197,10 +197,11 @@ function fetchDataForDate(selectedDate, userData) {
 
 function displayUserData(userData) {
     // Clear old data
-    $('#deleteUser').empty();
+    $('#deleteInfoUser').empty();
     $('#selectedUserPicture').empty();
     $('#selectedUserInfo').empty();
 
+    $('#calendarHeading').empty()
     $('#moodPieChartHeading').empty();
     $('#userWebsitesHeading').empty();
 
@@ -307,17 +308,20 @@ function displayUserData(userData) {
         let webpages = userData.webpages.map(w => w.urls);
         let mostFrequentWebsite = 'http://' + findMostFrequent(webpages);
 
+        var userImage = $('<img>').attr('src', '/static/images/profile.png').css({
+            'max-width': '200px',
+            'max-height': '200px'
+        }).addClass('img-fluid');
+        var deleteUser = $('<button class="transparent-button">').html('<img src="/static/images/bin.png" style="max-width: 30px; max-heigth: 30px;">').addClass('img-fluid');
+        deleteUser.click(function () {
+            $('#deletePersonModal').modal('show');
+        });
+        var infoUser = $('<button class="transparent-button" data-toggle="popover"' + 'data-content="This page provides a summary of the recorded data for the monitored individual. Hover over each graph to discover additional details.">'
+        ).html('<img src="/static/images/info.png" style="max-width: 30px; max-heigth: 30px;">').addClass('img-fluid');
+        infoUser.popover({trigger: 'focus'});
+
         // calendar
         {
-            var userImage = $('<img>').attr('src', '/static/images/profile.png').css({
-                'max-width': '200px',
-                'max-height': '200px'
-            }).addClass('img-fluid');
-            var deleteUser = $('<button class="transparent-button">').html('<img src="/static/images/bin.png" style="max-width: 30px; max-heigth: 30px;">').addClass('img-fluid');
-            deleteUser.click(function () {
-                $('#deletePersonModal').modal('show');
-            });
-
             let dailyMoods = {};
             let moodsByDate = {};
             userData.moods.forEach(moodData => {
@@ -347,7 +351,7 @@ function displayUserData(userData) {
                     title: dailyMoods[date],
                     start: date,
                     allDay: true,
-                    color: moodColors[dailyMoods[date]].backgroundColor,
+                    color: moodCalendarColors[dailyMoods[date]],
                     display: 'background',
                     overlap: false,
                     textColor: 'black'
@@ -373,8 +377,7 @@ function displayUserData(userData) {
                     if (calendarData.pieData.labels.length == 0 && calendarData.barData.labels.length == 0) {
                         $('#calendarNoData').empty()
                         $('#calendarNoData').append('<em><p style=\"color:gray;\">No data recorded</p></em>');
-                    }
-                    else {
+                    } else {
                         $('#calendarNoData').empty()
                     }
 
@@ -439,16 +442,22 @@ function displayUserData(userData) {
                     let startMoodTimes = calendarData.timelineData.moodData.map(e => new Date(e.start)).filter(date => !isNaN(date));
                     let startWebTimes = calendarData.timelineData.webData.map(e => new Date(e.start)).filter(date => !isNaN(date));
 
-                    if (calendarData.timelineData.moodData.length > 0) {
+                    if (calendarData.timelineData.moodData.length > 0 && calendarData.timelineData.webData.length > 0) {
                         $('#dayMoodCalendar').parent().show()
-                        let minMoodStart = new Date(Math.min(...startMoodTimes))
-                        minMoodStart.setMinutes(0);
+                        let minMoodStart = startMoodTimes.length > 0 ? new Date(Math.min(...startMoodTimes)) : new Date(Infinity);
                         let minStartMoodTime = minMoodStart.toISOString().slice(11, 19);
+                        let minWebStart = startWebTimes.length > 0 ? new Date(Math.min(...startWebTimes)) : new Date(Infinity);
+                        let minStartWebTime = minWebStart.toISOString().slice(11, 19);
+                        let minStartTime = minMoodStart < minWebStart ? minStartMoodTime : minStartWebTime;
 
                         let maxMoodEnd = new Date(Math.max(...startMoodTimes))
                         maxMoodEnd.setHours(maxMoodEnd.getHours() + 1);
                         maxMoodEnd.setMinutes(0);
                         let maxEndMoodTime = maxMoodEnd.toISOString().slice(11, 19);
+                        let maxWebEnd = new Date(Math.max(...startWebTimes))
+                        maxWebEnd.setHours(maxWebEnd.getHours() + 1);
+                        maxWebEnd.setMinutes(0);
+                        let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
 
                         var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
                             initialView: 'timeGridDay',
@@ -456,7 +465,7 @@ function displayUserData(userData) {
                             height: 'auto',
                             headerToolbar: false,
                             allDaySlot: false,
-                            slotMinTime: minStartMoodTime,
+                            slotMinTime: minStartTime,
                             slotMaxTime: maxEndMoodTime,
                             slotDuration: '00:05:00',
                             slotLabelInterval: '00:10:00',
@@ -471,28 +480,15 @@ function displayUserData(userData) {
                             }
                         });
                         timelineMoodCalendar.render();
-                    } else {
-                        $('#dayMoodCalendar').parent().hide();
-                    }
 
-                    if (calendarData.timelineData.webData.length > 0) {
                         $('#dayWebCalendar').parent().show()
-                        let minWebStart = new Date(Math.min(...startWebTimes))
-                        minWebStart.setMinutes(0);
-                        let minStartWebTime = minWebStart.toISOString().slice(11, 19);
-
-                        let maxWebEnd = new Date(Math.max(...startWebTimes))
-                        maxWebEnd.setHours(maxWebEnd.getHours() + 1);
-                        maxWebEnd.setMinutes(0);
-                        let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
-
                         var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
                             initialView: 'timeGridDay',
                             initialDate: new Date(info.dateStr),
                             height: 'auto',
                             headerToolbar: false,
                             allDaySlot: false,
-                            slotMinTime: minStartWebTime,
+                            slotMinTime: minStartTime,
                             slotMaxTime: maxEndWebTime,
                             slotDuration: '00:05:00',
                             slotLabelInterval: '00:10:00',
@@ -507,15 +503,87 @@ function displayUserData(userData) {
                             }
                         });
                         timelineWebCalendar.render();
+
                     } else {
-                        $('#dayWebCalendar').parent().hide();
+                        if (calendarData.timelineData.moodData.length > 0) {
+                            $('#dayMoodCalendar').parent().show()
+                            let minMoodStart = new Date(Math.min(...startMoodTimes))
+                            minMoodStart.setMinutes(0);
+                            let minStartMoodTime = minMoodStart.toISOString().slice(11, 19);
+
+                            let maxMoodEnd = new Date(Math.max(...startMoodTimes))
+                            maxMoodEnd.setHours(maxMoodEnd.getHours() + 1);
+                            maxMoodEnd.setMinutes(0);
+                            let maxEndMoodTime = maxMoodEnd.toISOString().slice(11, 19);
+
+                            var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
+                                initialView: 'timeGridDay',
+                                initialDate: new Date(info.dateStr),
+                                height: 'auto',
+                                headerToolbar: false,
+                                allDaySlot: false,
+                                slotMinTime: minStartMoodTime,
+                                slotMaxTime: maxEndMoodTime,
+                                slotDuration: '00:05:00',
+                                slotLabelInterval: '00:10:00',
+                                events: calendarData.timelineData.moodData,
+                                defaultTimedEventDuration: '00:00:01',
+                                displayEventTime: false,
+                                eventClassNames: 'event-style',
+                                eventOverlap: false,
+                                eventMouseEnter: function (info) {
+                                    var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
+                                    $(info.el).attr('title', 'Time: ' + startTime);
+                                }
+                            });
+                            timelineMoodCalendar.render();
+                        } else {
+                            $('#dayMoodCalendar').parent().hide();
+                        }
+                        if (calendarData.timelineData.webData.length > 0) {
+                            $('#dayWebCalendar').parent().show()
+                            let minWebStart = new Date(Math.min(...startWebTimes))
+                            minWebStart.setMinutes(0);
+                            let minStartWebTime = minWebStart.toISOString().slice(11, 19);
+
+                            let maxWebEnd = new Date(Math.max(...startWebTimes))
+                            maxWebEnd.setHours(maxWebEnd.getHours() + 1);
+                            maxWebEnd.setMinutes(0);
+                            let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
+
+                            var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
+                                initialView: 'timeGridDay',
+                                initialDate: new Date(info.dateStr),
+                                height: 'auto',
+                                headerToolbar: false,
+                                allDaySlot: false,
+                                slotMinTime: minStartWebTime,
+                                slotMaxTime: maxEndWebTime,
+                                slotDuration: '00:05:00',
+                                slotLabelInterval: '00:10:00',
+                                events: calendarData.timelineData.webData,
+                                defaultTimedEventDuration: '00:00:01',
+                                displayEventTime: false,
+                                eventClassNames: 'event-style',
+                                eventOverlap: false,
+                                eventMouseEnter: function (info) {
+                                    var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
+                                    $(info.el).attr('title', 'Time: ' + startTime);
+                                }
+                            });
+                            timelineWebCalendar.render();
+                        } else {
+                            $('#dayWebCalendar').parent().hide();
+                        }
                     }
+
                 }
             });
             calendar.render();
         }
 
-        $('#deleteUser').append(deleteUser);
+        $('#deleteInfoUser').append(infoUser);
+        $('#deleteInfoUser').append(deleteUser);
         $('#selectedUserPicture').append(userImage);
         $('#selectedUserInfo').append('<p></p><p></p>');
         $('#selectedUserInfo').append('<p><strong>Name:</strong>  ' + userData.name + '</p>');
@@ -523,7 +591,30 @@ function displayUserData(userData) {
         $('#selectedUserInfo').append('<p><strong>Most frequent mood:</strong>  ' + mostFrequentMood + '</p>');
         $('#selectedUserInfo').append(`<p><strong>Most visited website:</strong> <a href="${mostFrequentWebsite}" target="_blank">${mostFrequentWebsite}</a></p>`);
 
-        $('#moodPieChartHeading').append('Mood Overview');
-        $('#userWebsitesHeading').append('Website Overview');
+        var popoverOptions = {trigger: 'focus'};
+        var htmlContent = '<img src="/static/images/info.png" style="max-width: 15px; max-height: 15px;">';
+
+        var infoMoodOverview = $('<button>', {
+            class: 'transparent-button',
+            'data-toggle': 'popover',
+            'data-content': 'This graph displays the overall mood overview of moods detected over the recorded period.'
+        }).html(htmlContent).addClass('img-fluid').popover(popoverOptions);
+
+        var infoWebOverview = $('<button>', {
+            class: 'transparent-button',
+            'data-toggle': 'popover',
+            'data-content': 'This graph displays the overall website overview of pages visited over the recorded period.'
+        }).html(htmlContent).addClass('img-fluid').popover(popoverOptions);
+
+        var infoCalendar = $('<button>', {
+            class: 'transparent-button',
+            'data-toggle': 'popover',
+            'data-content': 'This calendar displays the most frequent mood detected for recorded day. Click on a specific day to access more detailed information about the recorded data for the particular day.'
+        }).html(htmlContent).addClass('img-fluid').popover(popoverOptions);
+
+
+        $('#moodPieChartHeading').append('Mood Overview', $('<sup>').append(infoMoodOverview));
+        $('#userWebsitesHeading').append('Website Overview', $('<sup>').append(infoWebOverview));
+        $('#calendarHeading').append('Calendar Overview', $('<sup>').append(infoCalendar));
     }
 }
