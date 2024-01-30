@@ -452,11 +452,11 @@ function displayUserData(userData) {
 
                         let maxMoodEnd = new Date(Math.max(...startMoodTimes))
                         maxMoodEnd.setHours(maxMoodEnd.getHours() + 1);
-                        maxMoodEnd.setMinutes(0);
+                        maxMoodEnd.setMinutes(10);
                         let maxEndMoodTime = maxMoodEnd.toISOString().slice(11, 19);
                         let maxWebEnd = new Date(Math.max(...startWebTimes))
                         maxWebEnd.setHours(maxWebEnd.getHours() + 1);
-                        maxWebEnd.setMinutes(0);
+                        maxWebEnd.setMinutes(10);
                         let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
 
                         var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
@@ -508,12 +508,12 @@ function displayUserData(userData) {
                         if (calendarData.timelineData.moodData.length > 0) {
                             $('#dayMoodCalendar').parent().show()
                             let minMoodStart = new Date(Math.min(...startMoodTimes))
-                            minMoodStart.setMinutes(0);
+                            minMoodStart.setMinutes(10);
                             let minStartMoodTime = minMoodStart.toISOString().slice(11, 19);
 
                             let maxMoodEnd = new Date(Math.max(...startMoodTimes))
                             maxMoodEnd.setHours(maxMoodEnd.getHours() + 1);
-                            maxMoodEnd.setMinutes(0);
+                            maxMoodEnd.setMinutes(10);
                             let maxEndMoodTime = maxMoodEnd.toISOString().slice(11, 19);
 
                             var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
@@ -543,12 +543,12 @@ function displayUserData(userData) {
                         if (calendarData.timelineData.webData.length > 0) {
                             $('#dayWebCalendar').parent().show()
                             let minWebStart = new Date(Math.min(...startWebTimes))
-                            minWebStart.setMinutes(0);
+                            minWebStart.setMinutes(10);
                             let minStartWebTime = minWebStart.toISOString().slice(11, 19);
 
                             let maxWebEnd = new Date(Math.max(...startWebTimes))
                             maxWebEnd.setHours(maxWebEnd.getHours() + 1);
-                            maxWebEnd.setMinutes(0);
+                            maxWebEnd.setMinutes(10);
                             let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
 
                             var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
