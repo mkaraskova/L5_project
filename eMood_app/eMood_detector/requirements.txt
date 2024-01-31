@@ -3,3 +3,5 @@ plyer~=2.1.0
 fer~=22.5.1
 opencv-python~=4.6.0.66
 requests~=2.31.0
+pystray~=0.19.5
+pillow~=10.2.0

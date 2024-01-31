@@ -269,7 +269,6 @@ function displayUserData(userData) {
                 }
             });
         }
-
         // webpage Bar Chart
         {
             let webpageData = {};
@@ -286,12 +285,18 @@ function displayUserData(userData) {
                     // skip invalid url
                 }
             });
+
+            let webpageArray = Object.keys(webpageData).map(key => ({
+                label: key,
+                data: webpageData[key],
+            })).sort((a, b) => b.data - a.data);
+
             var ctxWebpage = document.getElementById('webPageBarChart').getContext('2d');
             var webpageChartData = {
-                labels: Object.keys(webpageData),
+                labels: webpageArray.map(item => item.label),
                 datasets: [{
                     label: 'Webpage frequency',
-                    data: Object.values(webpageData),
+                    data: webpageArray.map(item => item.data),
                     backgroundColor: '#B89BC7',
                     borderColor: '#B89BC7'
                 }]
@@ -373,7 +378,6 @@ function displayUserData(userData) {
                     if (CalendarBarChart != null) CalendarBarChart.destroy();
                     let dateClicked = info.dateStr;
                     let calendarData = fetchDataForDate(dateClicked, userData);
-                    console.log(calendarData)
                     if (calendarData.pieData.labels.length == 0 && calendarData.barData.labels.length == 0) {
                         $('#calendarNoData').empty()
                         $('#calendarNoData').append('<em><p style=\"color:gray;\">No data recorded</p></em>');
@@ -411,6 +415,7 @@ function displayUserData(userData) {
                     if (calendarData.barData.labels.length > 0) {
                         $('#dayWebChart').show()
                         let barCtx = document.getElementById('dailyWebPageBarChart').getContext('2d');
+                        console.log(calendarData.barData)
                         CalendarBarChart = new Chart(barCtx, {
                             type: 'bar',
                             data: calendarData.barData,
