@@ -1,11 +1,9 @@
 import io
 import json
-import shutil
 import uuid
 from flask import send_file
-import subprocess
-from flask import Flask, request, jsonify, send_from_directory
-from flask_wtf.csrf import CSRFProtect, generate_csrf
+from flask import jsonify
+from flask_wtf.csrf import generate_csrf
 from fer import FER
 import bson
 from flask_wtf.csrf import CSRFProtect
@@ -13,7 +11,6 @@ from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import LoginManager, UserMixin, login_user, login_required, current_user, logout_user
 from flask import Flask, render_template, request, redirect, url_for
-import os
 from datetime import timedelta, datetime
 
 from helpers import *
@@ -82,7 +79,6 @@ def register():
         return render_template('register.html')
 
     hashed_pwd = generate_password_hash(request.form['password'], method='sha256')
-
     new_user = {
         "_id": bson.ObjectId(),
         "name": request.form['name'],
@@ -90,9 +86,6 @@ def register():
         "gender": "N/A",
         "password": hashed_pwd,
     }
-
-    # Insert the new user into database
-    # Make sure to handle the case where the user already exists
     if users.find_one({"email": new_user["email"]}):
         return 'Email already exists'
     else:
@@ -177,7 +170,6 @@ def edit_profile():
     gender = request.form.get('gender')
 
     update_fields = {}
-
     if name:
         update_fields["name"] = name
     if email:
@@ -201,9 +193,7 @@ def detect_url():
             "urls": urls[0],  # only logs the active web page
             "timestamp": current_timestamp
         })
-        monitored_users.update_one({"userId": user_id}, {"$set": {
-            "active": current_timestamp
-        }})
+        monitored_users.update_one({"userId": user_id}, {"$set": {"active": current_timestamp}})
         response = jsonify('Urls added successfully!')
         response.status_code = 200
         return response
@@ -235,7 +225,6 @@ def delete_person():
         moods.delete_many({'userId': person_id})
         webpages.delete_many({'userId': person_id})
         return jsonify({'message': f'User deleted successfully'}), 200
-
     return jsonify({'message': 'No user name provided'}), 400
 
 
@@ -243,50 +232,46 @@ def delete_person():
 def add_person():
     name = request.form.get('name')
     monitor_time = request.form.get('monitor')
+    platform = request.form.get('platform')
     user_id = str(uuid.uuid4())
     creator = current_user.email
+
+    if platform == 'Windows':
+        detector_path = 'eMood_app/eMood_detector/windows_app'
+    elif platform == 'macOS':
+        detector_path = 'eMood_app/eMood_detector/macos_app'
 
     # Create a BytesIO object to hold the ZIP file in memory
     zip_buffer = io.BytesIO()
 
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zipf:
-        # add app files
+        # add web monitoring files
         for file in os.listdir('eMood_app/eMood_plugin'):
             file_path = os.path.join('eMood_app/eMood_plugin', file)
             if os.path.isfile(file_path):
-                zipf.write(file_path, arcname=os.path.join(f"eMood_plugin_{name}", file))
+                zipf.write(file_path, arcname=os.path.join(f"eMood_plugin", file))
 
-        data = json.dumps({"user_id": user_id, "monitor_time": monitor_time})
-        zipf.writestr(f"eMood_plugin_{name}/userid.json", data.encode('utf-8'))
+        # Add userid and monitor time
+        zipf.writestr(f"eMood_plugin/userid.txt", f"{user_id}\n{monitor_time}".encode('utf-8'))
 
-        # add plugin files
-        for file in os.listdir('eMood_app/eMood_detector'):
-            file_path = os.path.join('eMood_app/eMood_detector', file)
+        # add mood monitoring files
+        for file in os.listdir(detector_path):
+            file_path = os.path.join(detector_path, file)
             if os.path.isfile(file_path):
-                zipf.write(file_path, arcname=os.path.join(f"eMood_detector_{name}", file))
+                zipf.write(file_path, arcname=os.path.join(f"eMood_detector", file))
 
-        # Add userid and monitor time to plugin
-        zipf.writestr(f"eMood_plugin_{name}/userid.txt", f"{user_id}\n{monitor_time}".encode('utf-8'))
+        # Add userid and monitor time
+        data = json.dumps({"userId": user_id, "detection_time": monitor_time})
+        zipf.writestr(f"eMood_detector/settings.json", data.encode('utf-8'))
 
-    # Reset the buffer position to the beginning
     zip_buffer.seek(0)
-
     monitored_users.insert_one({"userId": user_id, "creator": creator, "name": name, "active": None})
-
-    # Return the generated ZIP file as a Flask response without saving it locally
-    return send_file(
-        zip_buffer,
-        as_attachment=True,
-        download_name=f"eMood_plugin_{name}.zip"
-    )
+    return send_file(zip_buffer, as_attachment=True, download_name=f"eMood.zip")
 
 
 @app.errorhandler(404)
-def not_found(error=None):
-    message = {
-        'status': 404,
-        'message': 'Not Found: ' + request.url,
-    }
+def not_found():
+    message = {'status': 404, 'message': 'Not Found: ' + request.url}
     resp = jsonify(message)
     resp.status_code = 404
     return resp

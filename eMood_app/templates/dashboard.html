@@ -19,8 +19,8 @@
 {% block content %}
 <main>
     <!-- The Add Person Modal -->
-    <div class="modal" id="addPersonModal" tabindex="-1" style="margin-top: 80px;">
-        <div class="modal-dialog">
+    <div class="modal" id="addPersonModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
             <div class="modal-content">
                 <form id="addPersonForm" action="/add-person" method="post">
                     <div class="modal-header">
@@ -36,16 +36,50 @@
                             <input type="number" class="form-control" id="monitor" name="monitor" min="10" max="60"
                                    required>
                         </div>
-                        <h3 style="text-align: center">Instructions</h3>
+                        <div class="form-group">
+                            <label for="platform">Choose Platform:</label>
+                            <select class="form-control" id="platform" name="platform" required>
+                                <option value="">Select...</option>
+                                <option value="Windows">Windows</option>
+                                <option value="macOS">macOS</option>
+                            </select>
+                        </div>
+                        <h4 style="text-align: center">eMood Monitoring Setup Instructions</h4>
+                        <hr>
+
+                        <h5 style="text-align: center">General Setup</h5>
                         <ol>
-                            <li>When you click the Add button, the zip file will automatically download.</li>
-                            <li>Unzip this file to a directory of your choice.</li>
-                            <li>After, open a Chrome browser and navigate to Manage Extensions.</li>
-                            <li>Ensure the Developer Mode is selected in the right upper corner.</li>
-                            <li>Afterward, click on the Load unpacked and select the folder with the unzipped extension.
+                            <li>Click the "Add" button to automatically download the zip file.</li>
+                            <li>Unzip the files to a directory of your choice.</li>
+                            <li>The unzipped files are divided into two categories: "Web Monitoring" and "Mood
+                                Monitoring".
                             </li>
-                            <li>Now you are ready to monitor the person's moods.</li>
+                            <li>These instructions should be performed on the computer you wish to monitor.</li>
                         </ol>
+
+                        <h5 style="text-align: center">Web Monitoring Setup</h5>
+                        <ol>
+                            <li>Open a Chrome browser and navigate to "Manage Extensions".</li>
+                            <li>Ensure "Developer Mode" is selected in the upper right corner.</li>
+                            <li>Click on "Load unpacked" and select the folder named "eMood plugin" that you just
+                                downloaded.
+                            </li>
+                            <li>This setup will continuously monitor the user's web pages whenever they are online.</li>
+                            <li>You have now set up web monitoring.</li>
+                        </ol>
+
+                        <h5 style="text-align: center">Mood Monitoring Setup</h5>
+                        <ol>
+                            <li>Place the folder named "eMood detector" on your desktop.</li>
+                            <li>Navigate inside the folder and click on "app.exe" to run the mood monitoring
+                                application.
+                            </li>
+                            <li>Unlike Web Monitoring, you need to start this application each time the user boots up
+                                their computer.
+                            </li>
+                            <li>You have now set up mood monitoring.</li>
+                        </ol>
+
                     </div>
                     <div class="modal-footer">
                         <button type="submit" class="btn btn-primary">Add</button>
@@ -57,7 +91,7 @@
         </div>
     </div>
 
-    <div class="modal" id="deletePersonModal" tabindex="-1" style="margin-top: 80px;">
+    <div class="modal" id="deletePersonModal" tabindex="-1">
         <div class="modal-dialog">
             <div class="modal-content">
                 <form id="deletePersonForm" action="/delete-person" method="post">
@@ -86,7 +120,8 @@
                     <h4 class="modal-title text-center">Details</h4>
                 </div>
                 <div class="modal-body">
-                    <div id="calendarNoData" class="row" style="margin-right: 15px; margin-left: 15px; justify-content: center">
+                    <div id="calendarNoData" class="row"
+                         style="margin-right: 15px; margin-left: 15px; justify-content: center">
                     </div>
                     <div class="row" style="margin-right: 15px; margin-left: 15px;">
                         <div id="dayMoodChart" class="col" style="justify-content: center;">
@@ -150,7 +185,8 @@
                     <div id="selectedUserInfo" class="col d-flex flex-column justify-content-start">
                         <!-- Insert your content here -->
                     </div>
-                    <div id="deleteInfoUser" class="col-2 ml-auto flex-column justify-content-end" style="display: inline-block;">
+                    <div id="deleteInfoUser" class="col-2 ml-auto flex-column justify-content-end"
+                         style="display: inline-block;">
                         <!-- Insert your content here -->
                     </div>
                 </div>

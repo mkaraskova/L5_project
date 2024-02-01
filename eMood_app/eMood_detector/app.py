@@ -91,7 +91,7 @@ def send_moods_to_server_thread(server):
         time.sleep(5)
 
 
-def detect_emotion(user_id, detection_time, server):
+def detect_emotion(user_id, detection_time):
     webcam_fps = 30
     frame_interval = detection_time * 60 * webcam_fps
     detector = FER(mtcnn=False)
@@ -181,4 +181,4 @@ if __name__ == '__main__':
     server_communication_thread = threading.Thread(target=send_moods_to_server_thread, args=(server,))
     server_communication_thread.start()
 
-    detect_emotion(user_id, detection_time, server)
+    detect_emotion(user_id, detection_time)
