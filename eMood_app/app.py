@@ -30,8 +30,6 @@ webpages = db["Webpages"]
 moods = db["Moods"]
 monitored_users = db["MonitoredUsers"]
 
-detector = FER(mtcnn=False)
-
 csrf = CSRFProtect()
 csrf.init_app(app)
 
