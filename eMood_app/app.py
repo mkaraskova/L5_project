@@ -4,7 +4,6 @@ import uuid
 from flask import send_file
 from flask import jsonify
 from flask_wtf.csrf import generate_csrf
-from fer import FER
 import bson
 from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
