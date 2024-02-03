@@ -22,9 +22,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 
 # Initialize MongoDB client and collections
-connection_string = os.getenv('MONGO_DB')
-print(connection_string)
-client = MongoClient(os.getenv('MONGO_DB'))
+client = MongoClient(os.getenv('MONGO_DB'), connectTimeoutMS=30000, socketTimeoutMS=None, socketKeepAlive=True, connect=False, maxPoolSize=1)
 db = client["eMood"]
 users = db["Users"]
 webpages = db["Webpages"]
