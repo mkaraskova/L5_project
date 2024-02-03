@@ -267,11 +267,14 @@ def add_person():
 
 
 @app.errorhandler(404)
-def not_found():
+def not_found(error):
     message = {'status': 404, 'message': 'Not Found: ' + request.url}
     resp = jsonify(message)
     resp.status_code = 404
-    return resp
+    if current_user.is_authenticated:
+        return render_template('404.html'), 404
+    else:
+        return render_template('login.html'), 404
 
 
 @app.route('/get-csrf-token')
