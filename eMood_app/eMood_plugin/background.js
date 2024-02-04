@@ -63,6 +63,10 @@ async function fetchTokenAndPostUrls() {
                     },
                     body: JSON.stringify({urls: urlLog, userId: userId}),
                 });
+                 if (!response.ok) {
+                    console.error('Server error:', await response.text());
+                    return;
+                }
 
                 const data = await response.json();
                 console.log(data);

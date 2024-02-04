@@ -1,4 +1,5 @@
 import io
+import logging
 import json
 import uuid
 from flask import send_file
@@ -181,6 +182,7 @@ def edit_profile():
 @app.route('/webpage', methods=["POST"])
 def detect_url():
     try:
+        logging.info("Webpage data received")
         data = request.get_json()
         user_id = data.get('userId')
         urls = data['urls']
@@ -195,6 +197,7 @@ def detect_url():
         response.status_code = 200
         return response
     except Exception as e:
+        logging.exception("An error occured: ")
         response = jsonify({'error': str(e)})
         response.status_code = 500
         return response
