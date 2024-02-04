@@ -7,14 +7,14 @@ import time
 import cv2
 from fer import FER
 from PIL import Image
-from plyer import notification
+from win10toast import ToastNotifier
 import pystray
 import threading
 from queue import Queue
 
-
 moods_queue = Queue()
 running = True
+toaster = ToastNotifier()
 
 emotion_messages = {
     "titles": {
@@ -66,7 +66,8 @@ def send_moods_to_server_thread(server):
 
             headers = {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': token
+                'X-CSRFToken': token,
+                'Referer': 'https://emood.pythonanywhere.com/'
             }
 
             mood_server = server + '/mood'
@@ -97,20 +98,11 @@ def detect_emotion(user_id, detection_time):
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
     frame_no = 1
-
-    try:
-        notification.notify(
-            title='Hello',
-            message='Starting mood detection now...',
-            app_icon='icon.ico',
-            timeout=10,
-        )
-    except Exception:
-        notification.notify(
-            title='Hello',
-            message='Starting mood detection now...',
-            timeout=10,
-        )
+    toaster.show_toast(
+        'Hello',
+        'Starting mood detection now...',
+        icon_path='icon.ico',
+        duration=10)
 
     while running:
         ret, frame = webcam.read()
@@ -133,19 +125,11 @@ def detect_emotion(user_id, detection_time):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
-            try:
-                notification.notify(
-                    title=emotion_messages['titles'][emotion],
-                    message=emotion_messages['messages'][emotion],
-                    app_icon='icon.ico',
-                    timeout=20
-                )
-            except Exception:
-                notification.notify(
-                    title=emotion_messages['titles'][emotion],
-                    message=emotion_messages['messages'][emotion],
-                    timeout=20
-                )
+            toaster.show_toast(
+                emotion_messages['titles'][emotion],
+                emotion_messages['messages'][emotion],
+                icon_path='icon.ico',
+                duration=20)
             send_to_server(user_id, emotion, score)
         frame_no += 1
 

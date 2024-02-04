@@ -17,8 +17,6 @@ from helpers import *
 app = Flask(__name__)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
 app.config['SECRET_KEY'] = 'Thisismysecretkey'  # to be changed
-app.config['WTF_CSRF_TIME_LIMIT'] = None
-app.config['CSRF_CHECK_REFERER'] = False
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -197,7 +195,9 @@ def detect_url():
         response.status_code = 200
         return response
     else:
-        return not_found()
+        response = jsonify({'error': 'No urls provided in the request'})
+        response.status_code = 400
+        return response
 
 
 @app.route('/mood', methods=["POST"])

@@ -58,7 +58,8 @@ async function fetchTokenAndPostUrls() {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'X-CSRFToken': token // Token is used here
+                        'X-CSRFToken': token,
+                        'Referer': 'https://emood.pythonanywhere.com/'
                     },
                     body: JSON.stringify({urls: urlLog, userId: userId}),
                 });
