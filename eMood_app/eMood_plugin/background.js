@@ -38,14 +38,14 @@ async function fetchTokenAndPostUrls() {
             urlLog.push(getBaseUrl(tab.url));
         }
 
-        let isReachable = await isServerReachable('http://localhost:4000/get-csrf-token');
+        let isReachable = await isServerReachable('https://emood.pythonanywhere.com/get-csrf-token');
         if (!isReachable) {
             return; // If the server is unreachable, don't throw an error, simply return
         }
 
         // Regular logic here
         try {
-            const response = await fetch('http://localhost:4000/get-csrf-token');
+            const response = await fetch('https://emood.pythonanywhere.com/get-csrf-token');
             const data = await response.json();
             token = data['csrf_token']; // Token fetched from server
         } catch (error) {
@@ -54,7 +54,7 @@ async function fetchTokenAndPostUrls() {
 
         if (urlLog.length > 0 && token) {
             try {
-                const response = await fetch('http://localhost:4000/webpage', {
+                const response = await fetch('https://emood.pythonanywhere.com/webpage', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

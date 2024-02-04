@@ -169,7 +169,7 @@ if __name__ == '__main__':
         settings = json.load(file)
 
     user_id = settings['userId']
-    server = settings.get('server') or 'http://localhost:4000'
+    server = 'https://emood.pythonanywhere.com/'
     detection_time = settings['detection_time']
 
     image = Image.open("icon.ico")

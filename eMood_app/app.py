@@ -17,6 +17,7 @@ from helpers import *
 app = Flask(__name__)
 app.config['REMEMBER_COOKIE_DURATION'] = timedelta(days=14)
 app.config['SECRET_KEY'] = 'Thisismysecretkey'  # to be changed
+app.config['WTF_CSRF_CHECK_DEFAULT_REFERER'] = False
 
 login_manager = LoginManager()
 login_manager.init_app(app)
