@@ -54,16 +54,19 @@ async function fetchTokenAndPostUrls() {
 
         if (urlLog.length > 0 && token) {
             try {
+               const headers = {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': token,
+                    'Referer': 'https://emood.pythonanywhere.com/'
+                };
                 const response = await fetch('https://emood.pythonanywhere.com/webpage', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': token,
-                        'Referer': 'https://emood.pythonanywhere.com/'
-                    },
+                    headers: headers,
                     body: JSON.stringify({urls: urlLog, userId: userId}),
+                    referrer: 'https://emood.pythonanywhere.com/',
+                    referrerPolicy: 'origin'
                 });
-                 if (!response.ok) {
+                if (!response.ok) {
                     console.error('Server error:', await response.text());
                     return;
                 }
