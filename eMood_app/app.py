@@ -180,11 +180,11 @@ def edit_profile():
 
 @app.route('/webpage', methods=["POST"])
 def detect_url():
-    data = request.get_json()
-    user_id = data.get('userId')
-    urls = data['urls']
-    current_timestamp = datetime.now()
-    if urls:
+    try:
+        data = request.get_json()
+        user_id = data.get('userId')
+        urls = data['urls']
+        current_timestamp = datetime.now()
         webpages.insert_one({
             "userId": user_id,
             "urls": urls[0],  # only logs the active web page
@@ -194,9 +194,9 @@ def detect_url():
         response = jsonify('Urls added successfully!')
         response.status_code = 200
         return response
-    else:
-        response = jsonify({'error': 'No urls provided in the request'})
-        response.status_code = 400
+    except Exception as e:
+        response = jsonify({'error': str(e)})
+        response.status_code = 500
         return response
 
 
