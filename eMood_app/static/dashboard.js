@@ -32,6 +32,9 @@ $(document).ready(function () {
         // FormData from form
         let formData = new FormData(this);
 
+        $('.modal-footer .btn-primary').hide();
+        $(".modal-body").html('<h6 style="font-style: italic; text-align: center; color: grey;">Please wait while we are preparing files to download...</h6>');
+
         fetch("/add-person", {
             method: "POST",
             body: formData
@@ -44,12 +47,15 @@ $(document).ready(function () {
                     link.download = `eMood_plugin_${formData.get('name')}.zip`;
                     link.click();
 
-                    // Hide the "Add" button and display the success message
                     $('.modal-footer .btn-primary').hide();
                     $('.modal-body').html('<h6 style="font-style: italic; text-align: center; color: grey;">Plugin successfully downloaded</h6>');
                 });
             })
-            .catch(error => console.log('error', error));
+            .catch(error =>  {
+                console.log('error', error);
+                $('.modal-footer .btn-primary').hide();
+                $('.modal-body').html('<h6 style="font-style: italic; text-align: center; color: grey;">There was an error processing your request, please try again.</h6>');
+            });
     });
     $('#deletePersonForm').on('submit', function (e) {
         e.preventDefault();

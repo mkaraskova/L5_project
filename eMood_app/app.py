@@ -242,7 +242,7 @@ def add_person():
 
     if platform == 'Windows':
         detector_path = 'eMood_app/eMood_detector/windows_app'
-        exe_url = 'https://github.com/mkaraskova/L5_project/raw/main/eMood_app/eMood_detector/windows_app/app.exe?download='
+        exe_url = 'https://www.dropbox.com/scl/fi/spohmcustw96cp3drse2t/app.exe?rlkey=rrr8aqvk3ya0bceqfkrk4u79e&dl=1'
     elif platform == 'macOS':
         detector_path = 'eMood_app/eMood_detector/macos_app'
         exe_url = 'https://example.com/file'
