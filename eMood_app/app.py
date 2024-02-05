@@ -242,7 +242,7 @@ def add_person():
 
     if platform == 'Windows':
         detector_path = 'eMood_app/eMood_detector/windows_app'
-        exe_url = 'https://drive.google.com/drive/folders/1dGRVVTqmtABdITJd3ca2mFIts1F-pFeN?usp=sharing'
+        exe_url = 'https://github.com/mkaraskova/L5_project/raw/main/eMood_app/eMood_detector/windows_app/app.exe?download='
     elif platform == 'macOS':
         detector_path = 'eMood_app/eMood_detector/macos_app'
         exe_url = 'https://example.com/file'
@@ -266,8 +266,12 @@ def add_person():
                 zipf.write(file_path, arcname=os.path.join(f"eMood_detector", file))
 
         response = requests.get(exe_url)
-        content = response.content
-        zipf.writestr(arcname=os.path.join('eMood_detector', content))
+        if response.status_code == 200:
+            content = response.content
+            zipf.writestr('eMood_detector/app.exe', content)
+        else:
+            logging.error(f"Failed to download app.exe: {response.status_code}")
+
         data = json.dumps({"userId": user_id, "detection_time": monitor_time})
         zipf.writestr(f"eMood_detector/settings.json", data.encode('utf-8'))
 
