@@ -241,10 +241,10 @@ def add_person():
     creator = current_user.email
 
     if platform == 'Windows':
-        detector_path = 'eMood_app/eMood_detector/windows_app'
+        detector_path = 'eMood_detector/windows_app'
         exe_url = 'https://www.dropbox.com/scl/fi/spohmcustw96cp3drse2t/app.exe?rlkey=rrr8aqvk3ya0bceqfkrk4u79e&dl=1'
     elif platform == 'macOS':
-        detector_path = 'eMood_app/eMood_detector/macos_app'
+        detector_path = 'eMood_detector/macos_app'
         exe_url = 'https://example.com/file'
 
     # Create a BytesIO object to hold the ZIP file in memory
@@ -252,8 +252,8 @@ def add_person():
 
     with zipfile.ZipFile(zip_buffer, 'a', zipfile.ZIP_DEFLATED, False) as zipf:
         # add web monitoring files
-        for file in os.listdir('eMood_app/eMood_plugin'):
-            file_path = os.path.join('eMood_app/eMood_plugin', file)
+        for file in os.listdir('eMood_plugin'):
+            file_path = os.path.join('eMood_plugin', file)
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_plugin", file))
 
