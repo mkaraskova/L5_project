@@ -6,6 +6,7 @@ from flask import send_file
 from flask import jsonify
 from flask_wtf.csrf import generate_csrf
 import bson
+import requests
 from flask_wtf.csrf import CSRFProtect
 from pymongo import MongoClient
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -241,8 +242,10 @@ def add_person():
 
     if platform == 'Windows':
         detector_path = 'eMood_app/eMood_detector/windows_app'
+        exe_url = 'https://drive.google.com/drive/folders/1dGRVVTqmtABdITJd3ca2mFIts1F-pFeN?usp=sharing'
     elif platform == 'macOS':
         detector_path = 'eMood_app/eMood_detector/macos_app'
+        exe_url = 'https://example.com/file'
 
     # Create a BytesIO object to hold the ZIP file in memory
     zip_buffer = io.BytesIO()
@@ -254,7 +257,6 @@ def add_person():
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_plugin", file))
 
-        # Add userid and monitor time
         zipf.writestr(f"eMood_plugin/userid.txt", f"{user_id}\n{monitor_time}".encode('utf-8'))
 
         # add mood monitoring files
@@ -263,7 +265,9 @@ def add_person():
             if os.path.isfile(file_path):
                 zipf.write(file_path, arcname=os.path.join(f"eMood_detector", file))
 
-        # Add userid and monitor time
+        response = requests.get(exe_url)
+        content = response.content
+        zipf.writestr(arcname=os.path.join('eMood_detector', content))
         data = json.dumps({"userId": user_id, "detection_time": monitor_time})
         zipf.writestr(f"eMood_detector/settings.json", data.encode('utf-8'))
 
