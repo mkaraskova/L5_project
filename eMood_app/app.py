@@ -272,7 +272,7 @@ def add_person():
         else:
             logging.error(f"Failed to download app.exe: {response.status_code}")
 
-        data = json.dumps({"userId": user_id, "detection_time": monitor_time})
+        data = json.dumps({"userId": user_id, "detection_time": int(monitor_time)})
         zipf.writestr(f"eMood_detector/settings.json", data.encode('utf-8'))
 
     zip_buffer.seek(0)
