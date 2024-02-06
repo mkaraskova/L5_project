@@ -51,7 +51,7 @@ $(document).ready(function () {
                     $('.modal-body').html('<h6 style="font-style: italic; text-align: center; color: grey;">Plugin successfully downloaded</h6>');
                 });
             })
-            .catch(error =>  {
+            .catch(error => {
                 console.log('error', error);
                 $('.modal-footer .btn-primary').hide();
                 $('.modal-body').html('<h6 style="font-style: italic; text-align: center; color: grey;">There was an error processing your request, please try again.</h6>');
@@ -182,7 +182,7 @@ function fetchDataForDate(selectedDate, userData) {
         return {
             start: moodDate,
             title: moodRecord.mood,
-            color: moodCalendarColors[moodRecord.mood]
+            backgroundColor: moodCalendarColors[moodRecord.mood]
         };
     });
 
@@ -192,7 +192,7 @@ function fetchDataForDate(selectedDate, userData) {
         return {
             start: webpageDate,
             title: webRecord.urls,
-            color: "#B89BC7",
+            backgroundColor: "#B89BC7",
         };
     });
 
@@ -353,243 +353,129 @@ function displayUserData(userData) {
             var calendarEl = document.getElementById('calendar');
 
             var calendar = new FullCalendar.Calendar(calendarEl, {
-                firstDay: 1,
-                height: 'auto',
-                initialView: 'dayGridMonth',
-                dayMaxEventRows: true,
-                dayCellClassNames: ['calendarButtonClass'],
-                events: Object.keys(dailyMoods).map((date) => ({
-                    title: dailyMoods[date],
-                    start: date,
-                    allDay: true,
-                    color: moodCalendarColors[dailyMoods[date]],
-                    display: 'background',
-                    overlap: false,
-                    textColor: 'black'
-                })),
-                eventContent: function (arg) {
-                    var arrayOfDomNodes = []
-                    var el = document.createElement('div');
-                    el.innerHTML = arg.event.title;
-                    el.style.lineHeight = 'normal'; // Set back to normal
-                    el.style.height = '100%';
-                    el.style.display = 'flex';
-                    el.style.justifyContent = 'center';
-                    el.style.alignItems = 'center';
-                    arrayOfDomNodes.push(el);
-                    return {domNodes: arrayOfDomNodes};
-                },
-                dateClick: function (info) {
-                    if (CalendarPieChart != null) CalendarPieChart.destroy();
-                    if (CalendarBarChart != null) CalendarBarChart.destroy();
-                    let dateClicked = info.dateStr;
-                    let calendarData = fetchDataForDate(dateClicked, userData);
-                    if (calendarData.pieData.labels.length == 0 && calendarData.barData.labels.length == 0) {
-                        $('#calendarNoData').empty()
-                        $('#calendarNoData').append('<em><p style=\"color:gray;\">No data recorded</p></em>');
-                    } else {
-                        $('#calendarNoData').empty()
-                    }
+                        firstDay: 1,
+                        height: 'auto',
+                        initialView: 'dayGridMonth',
+                        dayMaxEventRows: true,
+                        dayCellClassNames: ['calendarButtonClass'],
+                        events: Object.keys(dailyMoods).map((date) => ({
+                            title: dailyMoods[date],
+                            start: date,
+                            allDay: true,
+                            color: moodCalendarColors[dailyMoods[date]],
+                            display: 'background',
+                            overlap: false,
+                            textColor: 'black'
+                        })),
+                        eventContent: function (arg) {
+                            var arrayOfDomNodes = []
+                            var el = document.createElement('div');
+                            el.innerHTML = arg.event.title;
+                            el.style.lineHeight = 'normal'; // Set back to normal
+                            el.style.height = '100%';
+                            el.style.display = 'flex';
+                            el.style.justifyContent = 'center';
+                            el.style.alignItems = 'center';
+                            arrayOfDomNodes.push(el);
+                            return {domNodes: arrayOfDomNodes};
+                        },
+                        dateClick: function (info) {
+                            if (CalendarPieChart != null) CalendarPieChart.destroy();
+                            if (CalendarBarChart != null) CalendarBarChart.destroy();
+                            let dateClicked = info.dateStr;
+                            let calendarData = fetchDataForDate(dateClicked, userData);
+                            if (calendarData.pieData.labels.length == 0 && calendarData.barData.labels.length == 0) {
+                                $('#calendarNoData').empty()
+                                $('#calendarNoData').append('<em><p style=\"color:gray;\">No data recorded</p></em>');
+                            } else {
+                                $('#calendarNoData').empty()
+                            }
 
-                    if (calendarData.pieData.labels.length > 0) {
-                        $('#dayMoodChart').show()
-                        let pieCtx = document.getElementById('dailyMoodPieChart').getContext('2d');
-                        CalendarPieChart = new Chart(pieCtx, {
-                            type: 'pie',
-                            data: calendarData.pieData,
-                            options: {
-                                responsive: true,
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: 'Mood Day Overview',
-                                        font: {
-                                            size: 20
+                            if (calendarData.pieData.labels.length > 0) {
+                                $('#dayMoodChart').show()
+                                let pieCtx = document.getElementById('dailyMoodPieChart').getContext('2d');
+                                CalendarPieChart = new Chart(pieCtx, {
+                                    type: 'pie',
+                                    data: calendarData.pieData,
+                                    options: {
+                                        responsive: true,
+                                        plugins: {
+                                            title: {
+                                                display: true,
+                                                text: 'Mood Day Overview',
+                                                font: {
+                                                    size: 20
+                                                }
+                                            },
+                                            legend: {
+                                                display: true,
+                                                position: 'right'
+                                            }
                                         }
-                                    },
-                                    legend: {
-                                        display: true,
-                                        position: 'right'
                                     }
-                                }
+                                });
+                            } else {
+                                $('#dayMoodChart').hide();
                             }
-                        });
-                    } else {
-                        $('#dayMoodChart').hide();
-                    }
 
-                    if (calendarData.barData.labels.length > 0) {
-                        $('#dayWebChart').show()
-                        let barCtx = document.getElementById('dailyWebPageBarChart').getContext('2d');
-                        console.log(calendarData.barData)
-                        CalendarBarChart = new Chart(barCtx, {
-                            type: 'bar',
-                            data: calendarData.barData,
-                            options: {
-                                responsive: true,
-                                maintainAspectRatio: false,
-                                plugins: {
-                                    title: {
-                                        display: true,
-                                        text: 'Website Day Overview',
-                                        font: {
-                                            size: 20
+                            if (calendarData.barData.labels.length > 0) {
+                                $('#dayWebChart').show()
+                                let barCtx = document.getElementById('dailyWebPageBarChart').getContext('2d');
+                                console.log(calendarData.barData)
+                                CalendarBarChart = new Chart(barCtx, {
+                                    type: 'bar',
+                                    data: calendarData.barData,
+                                    options: {
+                                        responsive: true,
+                                        plugins: {
+                                            legend: {
+                                                display: false
+                                            },
+                                            title: {
+                                                display: true,
+                                                text: 'Website Day Overview',
+                                                font: {
+                                                    size: 20
+                                                }
+                                            },
                                         }
-                                    },
-                                    legend: {
-                                        display: true
                                     }
-                                }
+                                });
+                            } else {
+                                $('#dayWebChart').hide();
                             }
-                        });
-                    } else {
-                        $('#dayWebChart').hide();
-                    }
-
-                    $("#calendarModal").modal('show');
-
-                    var dayMoodCalendar = document.getElementById('dayMoodCalendar');
-                    var dayWebCalendar = document.getElementById('dayWebCalendar');
-                    let startMoodTimes = calendarData.timelineData.moodData.map(e => new Date(e.start)).filter(date => !isNaN(date));
-                    let startWebTimes = calendarData.timelineData.webData.map(e => new Date(e.start)).filter(date => !isNaN(date));
-
-                    if (calendarData.timelineData.moodData.length > 0 && calendarData.timelineData.webData.length > 0) {
-                        $('#dayMoodCalendar').parent().show()
-                        let minMoodStart = startMoodTimes.length > 0 ? new Date(Math.min(...startMoodTimes)) : new Date(Infinity);
-                        let minStartMoodTime = minMoodStart.toISOString().slice(11, 19);
-                        let minWebStart = startWebTimes.length > 0 ? new Date(Math.min(...startWebTimes)) : new Date(Infinity);
-                        let minStartWebTime = minWebStart.toISOString().slice(11, 19);
-                        let minStartTime = minMoodStart < minWebStart ? minStartMoodTime : minStartWebTime;
-
-                        let maxMoodEnd = new Date(Math.max(...startMoodTimes))
-                        maxMoodEnd.setHours(maxMoodEnd.getHours() + 1);
-                        maxMoodEnd.setMinutes(10);
-                        let maxEndMoodTime = maxMoodEnd.toISOString().slice(11, 19);
-                        let maxWebEnd = new Date(Math.max(...startWebTimes))
-                        maxWebEnd.setHours(maxWebEnd.getHours() + 1);
-                        maxWebEnd.setMinutes(10);
-                        let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
-
-                        var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
-                            initialView: 'timeGridDay',
-                            initialDate: new Date(info.dateStr),
-                            height: 'auto',
-                            headerToolbar: false,
-                            allDaySlot: false,
-                            slotMinTime: minStartTime,
-                            slotMaxTime: maxEndMoodTime,
-                            slotDuration: '00:10:00',
-                            slotLabelInterval: '00:30:00',
-                            events: calendarData.timelineData.moodData,
-                            defaultTimedEventDuration: '00:00:01',
-                            displayEventTime: false,
-                            eventClassNames: 'event-style',
-                            eventOverlap: false,
-                            eventMouseEnter: function (info) {
-                                var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
-                                $(info.el).attr('title', 'Time: ' + startTime);
-                            }
-                        });
-                        timelineMoodCalendar.render();
-
-                        $('#dayWebCalendar').parent().show()
-                        var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
-                            initialView: 'timeGridDay',
-                            initialDate: new Date(info.dateStr),
-                            height: 'auto',
-                            headerToolbar: false,
-                            allDaySlot: false,
-                            slotMinTime: minStartTime,
-                            slotMaxTime: maxEndWebTime,
-                            slotDuration: '00:10:00',
-                            slotLabelInterval: '00:30:00',
-                            events: calendarData.timelineData.webData,
-                            defaultTimedEventDuration: '00:00:01',
-                            displayEventTime: false,
-                            eventClassNames: 'event-style',
-                            eventOverlap: false,
-                            eventMouseEnter: function (info) {
-                                var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
-                                $(info.el).attr('title', 'Time: ' + startTime);
-                            }
-                        });
-                        timelineWebCalendar.render();
-
-                    } else {
-                        if (calendarData.timelineData.moodData.length > 0) {
-                            $('#dayMoodCalendar').parent().show()
-                            let minMoodStart = new Date(Math.min(...startMoodTimes))
-                            minMoodStart.setMinutes(10);
-                            let minStartMoodTime = minMoodStart.toISOString().slice(11, 19);
-
-                            let maxMoodEnd = new Date(Math.max(...startMoodTimes))
-                            maxMoodEnd.setHours(maxMoodEnd.getHours() + 1);
-                            maxMoodEnd.setMinutes(10);
-                            let maxEndMoodTime = maxMoodEnd.toISOString().slice(11, 19);
-
-                            var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
-                                initialView: 'timeGridDay',
-                                initialDate: new Date(info.dateStr),
-                                height: 'auto',
-                                headerToolbar: false,
-                                allDaySlot: false,
-                                slotMinTime: minStartMoodTime,
-                                slotMaxTime: maxEndMoodTime,
-                                slotDuration: '00:10:00',
-                                slotLabelInterval: '00:30:00',
-                                events: calendarData.timelineData.moodData,
-                                defaultTimedEventDuration: '00:00:01',
-                                displayEventTime: false,
-                                eventClassNames: 'event-style',
-                                eventOverlap: false,
-                                eventMouseEnter: function (info) {
-                                    var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
-                                    $(info.el).attr('title', 'Time: ' + startTime);
-                                }
+                            $("#calendarModal").modal('show');
+                            var currentDate = new Date(dateClicked);
+                            var formattedDate = currentDate.toLocaleDateString('en-GB', {
+                                weekday: 'long',
+                                day: 'numeric',
+                                month: 'long',
+                                year: 'numeric'
                             });
-                            timelineMoodCalendar.render();
-                        } else {
-                            $('#dayMoodCalendar').parent().hide();
-                        }
-                        if (calendarData.timelineData.webData.length > 0) {
-                            $('#dayWebCalendar').parent().show()
-                            let minWebStart = new Date(Math.min(...startWebTimes))
-                            minWebStart.setMinutes(10);
-                            let minStartWebTime = minWebStart.toISOString().slice(11, 19);
+                            $('#dayCalendarHeading').empty();
+                            $('#dayCalendarHeading').append(formattedDate)
 
-                            let maxWebEnd = new Date(Math.max(...startWebTimes))
-                            maxWebEnd.setHours(maxWebEnd.getHours() + 1);
-                            maxWebEnd.setMinutes(10);
-                            let maxEndWebTime = maxWebEnd.toISOString().slice(11, 19);
+                            if (calendarData.timelineData.moodData.length > 0 || calendarData.timelineData.webData.length > 0) {
+                                $('#dayCalendar').show()
+                                var timelineCalendar = new FullCalendar.Calendar(dayCalendar, {
+                                    initialView: 'listDay',
+                                    initialDate: new Date(info.dateStr),
+                                    height: 'auto',
+                                    headerToolbar: false,
+                                    allDaySlot: false,
+                                    events: calendarData.timelineData.moodData.concat(calendarData.timelineData.webData),
+                                    eventClassNames: 'event-style',
+                                    eventOverlap: false,
+                                });
+                                timelineCalendar.render();
+                            } else {
+                                $('#dayCalendar').hide();
+                            }
 
-                            var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
-                                initialView: 'timeGridDay',
-                                initialDate: new Date(info.dateStr),
-                                height: 'auto',
-                                headerToolbar: false,
-                                allDaySlot: false,
-                                slotMinTime: minStartWebTime,
-                                slotMaxTime: maxEndWebTime,
-                                slotDuration: '00:10:00',
-                                slotLabelInterval: '00:30:00',
-                                events: calendarData.timelineData.webData,
-                                defaultTimedEventDuration: '00:00:01',
-                                displayEventTime: false,
-                                eventClassNames: 'event-style',
-                                eventOverlap: false,
-                                eventMouseEnter: function (info) {
-                                    var startTime = info.event.start.toLocaleDateString() + ' ' + info.event.start.toLocaleTimeString();
-                                    $(info.el).attr('title', 'Time: ' + startTime);
-                                }
-                            });
-                            timelineWebCalendar.render();
-                        } else {
-                            $('#dayWebCalendar').parent().hide();
                         }
                     }
-
-                }
-            });
+                )
+            ;
             calendar.render();
         }
 

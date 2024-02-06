@@ -104,27 +104,6 @@ main {
     background-color: #eeeeee;
 }
 
-.fc-day-today {
-    background-color: inherit !important;
-    border: none !important;
-}
-
-.fc-event-title {
-    text-shadow: 2px 2px 2px rgba(0, 0, 0, 0.5);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.event-style {
-    font-size: 16px;
-    height: 25px;
-    color: black !important;
-    text-align: center;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
 
 .happy {
     background-color: yellow;
