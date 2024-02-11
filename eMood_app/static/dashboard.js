@@ -163,8 +163,10 @@ function fetchDataForDate(selectedDate, userData) {
         let formattedWebDate = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 
         if (formattedWebDate == selectedDate) {
-            webPageDataForDate[selectedDate].push(web.urls);
-            timelineWebPageDataForDate[selectedDate].push(web);
+            if (web.urls !== 'newtab') {
+                webPageDataForDate[selectedDate].push(web.urls);
+                timelineWebPageDataForDate[selectedDate].push(web);
+            }
         }
     });
 
@@ -286,7 +288,10 @@ function displayUserData(userData) {
                         urlString = 'https://' + urlString;
                     }
                     let url = new URL(urlString).hostname;
-                    webpageData[url] = (webpageData[url] + 1) || 1;
+                    // Skip newtab
+                    if (url !== 'newtab') {
+                        webpageData[url] = (webpageData[url] + 1) || 1;
+                    }
                 } catch (e) {
                     // skip invalid url
                 }
