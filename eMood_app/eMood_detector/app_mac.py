@@ -1,3 +1,5 @@
+from PIL import Image
+import pystray
 import requests
 import logging
 import json
@@ -144,6 +146,12 @@ if __name__ == '__main__':
     user_id = settings['userId']
     server = 'https://emood.pythonanywhere.com/'
     detection_time = settings['detection_time']
+
+    image = Image.open("icon.ico")
+    icon = pystray.Icon("eMood", image, "eMood",
+                        menu=pystray.Menu(pystray.MenuItem('Stop mood monitoring', quit_program)))
+    icon_thread = threading.Thread(target=icon.run)
+    icon_thread.start()
 
     server_communication_thread = threading.Thread(target=send_moods_to_server_thread, args=(server,))
     server_communication_thread.start()
