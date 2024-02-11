@@ -6,11 +6,9 @@ import sys
 import time
 import cv2
 from fer import FER
-import pystray
 import threading
 from queue import Queue
-from pync import Notifier
-
+import pync
 
 moods_queue = Queue()
 running = True
@@ -65,7 +63,8 @@ def send_moods_to_server_thread(server):
 
             headers = {
                 'Content-Type': 'application/json',
-                'X-CSRFToken': token
+                'X-CSRFToken': token,
+                'Referer': 'https://emood.pythonanywhere.com/'
             }
 
             mood_server = server + '/mood'
@@ -96,12 +95,7 @@ def detect_emotion(user_id, detection_time):
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
     frame_no = 1
-
-    Notifier.notify(
-        'Starting mood detection now...',
-        title='Hello',
-        appIcon='icon.ico',
-    )
+    pync.notify('Starting mood detection now...', title='Hello')
 
     while running:
         ret, frame = webcam.read()
@@ -124,12 +118,7 @@ def detect_emotion(user_id, detection_time):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
-
-            Notifier.notify(
-                emotion_messages['messages'][emotion],
-                title=emotion_messages['titles'][emotion],
-                appIcon='icon.ico',
-            )
+            pync.notify(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion])
             send_to_server(user_id, emotion, score)
         frame_no += 1
 
@@ -153,14 +142,8 @@ if __name__ == '__main__':
         settings = json.load(file)
 
     user_id = settings['userId']
-    server = settings.get('server') or 'http://localhost:4000'
+    server = 'https://emood.pythonanywhere.com/'
     detection_time = settings['detection_time']
-
-    image = Image.open("icon.ico")
-    icon = pystray.Icon("eMood", image, "eMood",
-                        menu=pystray.Menu(pystray.MenuItem('Stop mood monitoring', quit_program)))
-    icon_thread = threading.Thread(target=icon.run)
-    icon_thread.start()
 
     server_communication_thread = threading.Thread(target=send_moods_to_server_thread, args=(server,))
     server_communication_thread.start()
