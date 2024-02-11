@@ -10,7 +10,7 @@ import cv2
 from fer import FER
 import threading
 from queue import Queue
-import pync
+from pync import Notifier
 
 moods_queue = Queue()
 running = True
@@ -97,7 +97,7 @@ def detect_emotion(user_id, detection_time):
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
     frame_no = 1
-    pync.notify('Starting mood detection now...', title='Hello')
+    Notifier.notify('Starting mood detection now...', title='Hello')
 
     while running:
         ret, frame = webcam.read()
@@ -120,7 +120,7 @@ def detect_emotion(user_id, detection_time):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
-            pync.notify(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion])
+            Notifier.notify(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion])
             send_to_server(user_id, emotion, score)
         frame_no += 1
 
