@@ -36,8 +36,8 @@ emotion_messages = {
 
 def send_notification(message, title, icon_path=None):
     notification_script = f'display alert "{title}" message "{message}" as warning'
-    if icon_path:
-        notification_script += f' with icon POSIX file "{icon_path}"'
+    # if icon_path:
+    #     notification_script += f' with icon POSIX file "{icon_path}"'
 
     subprocess.run(['osascript', '-e', notification_script])
 
