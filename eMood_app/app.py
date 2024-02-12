@@ -245,7 +245,7 @@ def add_person():
         exe_url = 'https://www.dropbox.com/scl/fi/spohmcustw96cp3drse2t/app.exe?rlkey=rrr8aqvk3ya0bceqfkrk4u79e&dl=1'
     elif platform == 'macOS':
         detector_path = 'eMood_detector/macos_app'
-        exe_url = 'https://example.com/file'
+        exe_url = 'https://www.dropbox.com/scl/fi/xba1faqvxobrmsmymnlqo/app_mac?rlkey=i68m26bhvo0so09mnguz0ggdh&dl=1'
 
     # Create a BytesIO object to hold the ZIP file in memory
     zip_buffer = io.BytesIO()
