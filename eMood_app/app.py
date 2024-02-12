@@ -268,9 +268,12 @@ def add_person():
         response = requests.get(exe_url)
         if response.status_code == 200:
             content = response.content
-            zipf.writestr('eMood_detector/app.exe', content)
+            if platform == 'Windows':
+                zipf.writestr('eMood_detector/app.exe', content)
+            else:
+                zipf.writestr('eMood_detector/app', content)
         else:
-            logging.error(f"Failed to download app.exe: {response.status_code}")
+            logging.error(f"Failed to download app: {response.status_code}")
 
         data = json.dumps({"userId": user_id, "detection_time": int(monitor_time)})
         zipf.writestr(f"eMood_detector/settings.json", data.encode('utf-8'))
