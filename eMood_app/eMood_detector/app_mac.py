@@ -34,11 +34,8 @@ emotion_messages = {
 }
 
 
-def send_notification(message, title, icon_path=None):
+def send_notification(message, title):
     notification_script = f'display notification "{message}" with title "{title}"'
-    if icon_path:
-         notification_script += f' with icon alias "{icon_path}"'
-
     subprocess.run(['osascript', '-e', notification_script])
 
 
@@ -116,7 +113,7 @@ def detect_emotion(user_id, detection_time, icon_path):
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
     frame_no = 1
-    send_notification('Starting mood detection now...', 'Hello', icon_path)
+    send_notification('Starting mood detection now...', 'Hello')
 
     while running:
         ret, frame = webcam.read()
@@ -139,7 +136,7 @@ def detect_emotion(user_id, detection_time, icon_path):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
-            send_notification(emotion_messages['messages'][emotion], emotion_messages['titles'][emotion], icon_path)
+            send_notification(emotion_messages['messages'][emotion], emotion_messages['titles'][emotion])
             send_to_server(user_id, emotion, score)
         frame_no += 1
 
