@@ -138,12 +138,6 @@ def detect_emotion(user_id, detection_time):
     webcam.release()
 
 
-def quit_program(icon, item):
-    global running
-    running = False
-    icon.stop()
-
-
 if __name__ == '__main__':
     if getattr(sys, 'frozen', False):
         script_dir = os.path.dirname(sys.executable)
