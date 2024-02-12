@@ -271,7 +271,7 @@ def add_person():
             if platform == 'Windows':
                 zipf.writestr('eMood_detector/app.exe', content)
             else:
-                zipf.writestr('eMood_detector/app.app', content)
+                zipf.writestr('eMood_detector/app', content)
         else:
             logging.error(f"Failed to download app: {response.status_code}")
 
