@@ -9,7 +9,7 @@ import cv2
 from fer import FER
 import threading
 from queue import Queue
-from pync import Notifier
+from macos_notifications import send
 
 moods_queue = Queue()
 running = True
@@ -102,13 +102,13 @@ def send_moods_to_server_thread(server):
         time.sleep(5)
 
 
-def detect_emotion(user_id, detection_time):
+def detect_emotion(user_id, detection_time, icon_path):
     webcam_fps = 30
     frame_interval = detection_time * 60 * webcam_fps
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
     frame_no = 1
-    Notifier.notify('Starting mood detection now...', title='Hello')
+    send('Starting mood detection now...', title='Hello', icon=icon_path)
 
     while running:
         ret, frame = webcam.read()
@@ -131,7 +131,7 @@ def detect_emotion(user_id, detection_time):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
-            Notifier.notify(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion])
+            send(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion], icon=icon_path)
             send_to_server(user_id, emotion, score)
         frame_no += 1
 
@@ -156,7 +156,7 @@ if __name__ == '__main__':
     app = eMoodApp(icon_path)
 
     # Create detect_emotion and send_moods_to_server_thread threads
-    detect_emotion_thread = threading.Thread(target=detect_emotion, args=(user_id, detection_time))
+    detect_emotion_thread = threading.Thread(target=detect_emotion, args=(user_id, detection_time, icon_path))
     detect_emotion_thread.start()
 
     server_communication_thread = threading.Thread(target=send_moods_to_server_thread, args=(server,))
