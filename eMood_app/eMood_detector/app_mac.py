@@ -1,5 +1,4 @@
-from PIL import Image
-import pystray
+import rumps
 import requests
 import logging
 import json
@@ -10,7 +9,7 @@ import cv2
 from fer import FER
 import threading
 from queue import Queue
-# from pync import Notifier
+from pync import Notifier
 
 moods_queue = Queue()
 running = True
@@ -33,6 +32,18 @@ emotion_messages = {
         "fear": "Facing fears makes you stronger. You're braver than you think!"
     }
 }
+
+
+class eMoodApp(rumps.App):
+    def __init__(self, icon_path):
+        super(eMoodApp, self).__init__("eMood", icon=icon_path)
+        self.menu = ["Stop Mood Monitoring"]
+
+    @rumps.clicked("Stop Mood Monitoring")
+    def quit_program(self, _):
+        global running
+        running = False
+        rumps.quit_application()
 
 
 def send_to_server(user_id, emotion, confidence):
@@ -97,7 +108,7 @@ def detect_emotion(user_id, detection_time):
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
     frame_no = 1
-    # Notifier.notify('Starting mood detection now...', title='Hello')
+    Notifier.notify('Starting mood detection now...', title='Hello')
 
     while running:
         ret, frame = webcam.read()
@@ -120,7 +131,7 @@ def detect_emotion(user_id, detection_time):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
-            # Notifier.notify(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion])
+            Notifier.notify(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion])
             send_to_server(user_id, emotion, score)
         frame_no += 1
 
@@ -139,6 +150,7 @@ if __name__ == '__main__':
     else:
         script_dir = os.path.dirname(os.path.abspath(__file__))
 
+    icon_path = os.path.join(script_dir, 'icon.icns')
     settings_path = os.path.join(script_dir, 'settings.json')
     with open(settings_path, 'r') as file:
         settings = json.load(file)
@@ -147,11 +159,9 @@ if __name__ == '__main__':
     server = 'https://emood.pythonanywhere.com/'
     detection_time = settings['detection_time']
 
-    image = Image.open("icon.ico")
-    icon = pystray.Icon("eMood", image, "eMood",
-                        menu=pystray.Menu(pystray.MenuItem('Stop mood monitoring', quit_program)))
-    icon_thread = threading.Thread(target=icon.run)
-    icon_thread.start()
+    app = eMoodApp(icon_path)
+    app_thread = threading.Thread(target=app.run)
+    app_thread.start()
 
     server_communication_thread = threading.Thread(target=send_moods_to_server_thread, args=(server,))
     server_communication_thread.start()
