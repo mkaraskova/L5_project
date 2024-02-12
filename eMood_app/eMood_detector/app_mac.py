@@ -154,10 +154,17 @@ if __name__ == '__main__':
     detection_time = settings['detection_time']
 
     app = eMoodApp(icon_path)
-    app_thread = threading.Thread(target=app.run)
-    app_thread.start()
+
+    # Create detect_emotion and send_moods_to_server_thread threads
+    detect_emotion_thread = threading.Thread(target=detect_emotion, args=(user_id, detection_time))
+    detect_emotion_thread.start()
 
     server_communication_thread = threading.Thread(target=send_moods_to_server_thread, args=(server,))
     server_communication_thread.start()
 
-    detect_emotion(user_id, detection_time)
+    # Run the app on the main thread
+    app.run()
+
+    # Wait for the threads to complete if needed
+    detect_emotion_thread.join()
+    server_communication_thread.join()
