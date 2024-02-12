@@ -9,7 +9,7 @@ import cv2
 from fer import FER
 import threading
 from queue import Queue
-from macos_notifications import send
+import subprocess
 
 moods_queue = Queue()
 running = True
@@ -32,6 +32,14 @@ emotion_messages = {
         "fear": "Facing fears makes you stronger. You're braver than you think!"
     }
 }
+
+
+def send_notification(message, title, icon_path=None):
+    notification_script = f'display alert "{title}" message "{message}" as warning'
+    if icon_path:
+        notification_script += f' with icon file "{icon_path}"'
+
+    subprocess.run(['osascript', '-e', notification_script])
 
 
 class eMoodApp(rumps.App):
@@ -108,7 +116,7 @@ def detect_emotion(user_id, detection_time, icon_path):
     detector = FER(mtcnn=False)
     webcam = cv2.VideoCapture(0)
     frame_no = 1
-    send('Starting mood detection now...', title='Hello', icon=icon_path)
+    send_notification('Starting mood detection now...', 'Hello', icon_path)
 
     while running:
         ret, frame = webcam.read()
@@ -131,7 +139,7 @@ def detect_emotion(user_id, detection_time, icon_path):
             emotion = max(face["emotions"], key=face["emotions"].get)
             score = face["emotions"][emotion]
             logging.info(f"Mood detected: {emotion} with score: {score}")
-            send(emotion_messages['messages'][emotion], title=emotion_messages['titles'][emotion], icon=icon_path)
+            send_notification(emotion_messages['messages'][emotion], emotion_messages['titles'][emotion], icon_path)
             send_to_server(user_id, emotion, score)
         frame_no += 1
 
