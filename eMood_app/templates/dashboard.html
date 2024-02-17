@@ -124,17 +124,17 @@
                     <div id="calendarNoData" class="row"
                          style="margin-right: 15px; margin-left: 15px; justify-content: center;">
                     </div>
-                    <div class="row" style="margin-right: 15px; margin-left: 15px;">
-                        <div id="dayMoodChart" class="col">
-                            <canvas id="dailyMoodPieChart" width="200" height="200"></canvas>
+                    <div class="row" style="margin-right: 15px; margin-left: 15px; margin-top: 20px;">
+                        <div id="dayMoodChart" class="col-6 d-flex flex-column justify-content-center">
+                            <canvas id="dailyMoodPieChart" style="width:80%; height:80%;"></canvas>
                         </div>
-                        <div id="dayWebChart" class="col">
-                            <canvas id="dailyWebPageBarChart" width="200" height="200"></canvas>
+                        <div id="dayWebChart" class="col-6 d-flex flex-column justify-content-center">
+                            <canvas id="dailyWebPageBarChart" style="width:80%; height:80%;"></canvas>
                         </div>
                     </div>
                     <div class="row" style="margin-right: 15px; margin-left: 15px;">
-                        <div id="dayCalendar" class="col" style="justify-content: center; display: flex;">
-                        </div>
+                        <div id="dayMoodCalendar" class="col" style="justify-content: center; display: flex;"></div>
+                        <div id="dayWebCalendar" class="col" style="justify-content: center; display: flex;"></div>
                     </div>
                 </div>
                 <div class="modal-footer">

@@ -398,6 +398,8 @@ function displayUserData(userData) {
 
                             if (calendarData.pieData.labels.length > 0) {
                                 $('#dayMoodChart').show()
+                                $('#dailyMoodPieChart').show();
+                                $('#dayMoodChart').removeClass('col-12').addClass('col-6');
                                 let pieCtx = document.getElementById('dailyMoodPieChart').getContext('2d');
                                 CalendarPieChart = new Chart(pieCtx, {
                                     type: 'pie',
@@ -421,10 +423,13 @@ function displayUserData(userData) {
                                 });
                             } else {
                                 $('#dayMoodChart').hide();
+                                $('#dailyMoodPieChart').hide();
                             }
 
                             if (calendarData.barData.labels.length > 0) {
                                 $('#dayWebChart').show()
+                                $('#dailyWebPageBarChart').show();
+                                $('#dayWebChart').removeClass('col-12').addClass('col-6');
                                 let barCtx = document.getElementById('dailyWebPageBarChart').getContext('2d');
                                 console.log(calendarData.barData)
                                 CalendarBarChart = new Chart(barCtx, {
@@ -448,6 +453,7 @@ function displayUserData(userData) {
                                 });
                             } else {
                                 $('#dayWebChart').hide();
+                                $('#dailyWebPageBarChart').hide();
                             }
                             $("#calendarModal").modal('show');
                             var currentDate = new Date(dateClicked);
@@ -460,21 +466,45 @@ function displayUserData(userData) {
                             $('#dayCalendarHeading').empty();
                             $('#dayCalendarHeading').append(formattedDate)
 
-                            if (calendarData.timelineData.moodData.length > 0 || calendarData.timelineData.webData.length > 0) {
-                                $('#dayCalendar').show()
-                                var timelineCalendar = new FullCalendar.Calendar(dayCalendar, {
+                            if (calendarData.timelineData.webData.length > 0) {
+                                $('#dayWebCalendar').show()
+                                var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
                                     initialView: 'listDay',
                                     initialDate: new Date(info.dateStr),
                                     height: 'auto',
                                     headerToolbar: false,
                                     allDaySlot: false,
-                                    events: calendarData.timelineData.moodData.concat(calendarData.timelineData.webData),
+                                    events: calendarData.timelineData.webData,
                                     eventClassNames: 'event-style',
                                     eventOverlap: false,
                                 });
-                                timelineCalendar.render();
-                            } else {
-                                $('#dayCalendar').hide();
+                                timelineWebCalendar.render();
+                            }
+                            else {
+                                $('#dayWebCalendar').hide()
+                                $('#dayWebChart').hide()
+                                $('#dayMoodChart').removeClass('col-6').addClass('col-12');
+                            }
+                            if (calendarData.timelineData.moodData.length > 0) {
+                                $('#dayMoodCalendar').show()
+                                $('#dayMoodChart').show()
+                                $('#dayMoodChart').removeClass('col-12').addClass('col-6');
+                                var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
+                                    initialView: 'listDay',
+                                    initialDate: new Date(info.dateStr),
+                                    height: 'auto',
+                                    headerToolbar: false,
+                                    allDaySlot: false,
+                                    events: calendarData.timelineData.moodData,
+                                    eventClassNames: 'event-style',
+                                    eventOverlap: false,
+                                });
+                                timelineMoodCalendar.render();
+                            }
+                            else {
+                                $('#dayMoodCalendar').hide()
+                                $('#dayMoodChart').hide()
+                                $('#dayWebChart').removeClass('col-6').addClass('col-12');
                             }
 
                         }
