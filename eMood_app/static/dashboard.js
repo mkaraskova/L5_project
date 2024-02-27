@@ -181,9 +181,19 @@ function fetchDataForDate(selectedDate, userData) {
     // Convert moods data into timeline items
     let moodItems = timelineMoodDataForDate[selectedDate].map((moodRecord) => {
         let moodDate = new Date(moodRecord.timestamp)
+        let confidenceLevel;
+        if (moodRecord.confidence > 0.7) {
+            confidenceLevel = 'HIGH';
+        }
+        else if (moodRecord.confidence > 0.4) {
+            confidenceLevel = 'MODERATE';
+        }
+        else {
+            confidenceLevel = 'LOW';
+        }
         return {
             start: moodDate,
-            title: moodRecord.mood,
+            title: 'Emotion Detected: ' + moodRecord.mood.toUpperCase() + ' with Confidence Level: ' + confidenceLevel,
             backgroundColor: moodCalendarColors[moodRecord.mood]
         };
     });
@@ -193,7 +203,7 @@ function fetchDataForDate(selectedDate, userData) {
         let webpageDate = new Date(webRecord.timestamp)
         return {
             start: webpageDate,
-            title: webRecord.urls,
+            title: 'Website Visited: ' + webRecord.urls,
             backgroundColor: "#B89BC7",
         };
     });
@@ -466,45 +476,31 @@ function displayUserData(userData) {
                             $('#dayCalendarHeading').empty();
                             $('#dayCalendarHeading').append(formattedDate)
 
-                            if (calendarData.timelineData.webData.length > 0) {
-                                $('#dayWebCalendar').show()
-                                var timelineWebCalendar = new FullCalendar.Calendar(dayWebCalendar, {
-                                    initialView: 'listDay',
-                                    initialDate: new Date(info.dateStr),
-                                    height: 'auto',
-                                    headerToolbar: false,
-                                    allDaySlot: false,
-                                    events: calendarData.timelineData.webData,
-                                    eventClassNames: 'event-style',
-                                    eventOverlap: false,
-                                });
-                                timelineWebCalendar.render();
-                            }
-                            else {
-                                $('#dayWebCalendar').hide()
+                            if (calendarData.timelineData.webData.length == 0) {
                                 $('#dayWebChart').hide()
                                 $('#dayMoodChart').removeClass('col-6').addClass('col-12');
                             }
-                            if (calendarData.timelineData.moodData.length > 0) {
-                                $('#dayMoodCalendar').show()
-                                $('#dayMoodChart').show()
-                                $('#dayMoodChart').removeClass('col-12').addClass('col-6');
-                                var timelineMoodCalendar = new FullCalendar.Calendar(dayMoodCalendar, {
+
+                            if (calendarData.timelineData.moodData.length == 0) {
+                                $('#dayMoodChart').hide()
+                                $('#dayWebChart').removeClass('col-6').addClass('col-12');
+                            }
+                            if (calendarData.timelineData.webData.length > 0 || calendarData.timelineData.moodData.length > 0) {
+                                $('#dayCalendar').show()
+                                var timelineCalendar = new FullCalendar.Calendar(dayCalendar, {
                                     initialView: 'listDay',
                                     initialDate: new Date(info.dateStr),
                                     height: 'auto',
                                     headerToolbar: false,
                                     allDaySlot: false,
-                                    events: calendarData.timelineData.moodData,
+                                    events: [...calendarData.timelineData.webData, ...calendarData.timelineData.moodData],
                                     eventClassNames: 'event-style',
                                     eventOverlap: false,
                                 });
-                                timelineMoodCalendar.render();
+                                timelineCalendar.render();
                             }
                             else {
-                                $('#dayMoodCalendar').hide()
-                                $('#dayMoodChart').hide()
-                                $('#dayWebChart').removeClass('col-6').addClass('col-12');
+                                $('#dayCalendar').hide()
                             }
 
                         }
