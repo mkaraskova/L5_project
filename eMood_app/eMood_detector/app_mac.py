@@ -40,8 +40,8 @@ def send_notification(message, title):
 
 
 class eMoodApp(rumps.App):
-    def __init__(self, icon_path):
-        super(eMoodApp, self).__init__("eMood", icon=icon_path)
+    def __init__(self):
+        super(eMoodApp, self).__init__("eMood", icon='icon.png')
         self.menu = ["Stop Mood Monitoring"]
 
     @rumps.clicked("Stop Mood Monitoring")
@@ -107,7 +107,7 @@ def send_moods_to_server_thread(server):
         time.sleep(5)
 
 
-def detect_emotion(user_id, detection_time, icon_path):
+def detect_emotion(user_id, detection_time):
     webcam_fps = 30
     frame_interval = detection_time * 60 * webcam_fps
     detector = FER(mtcnn=False)
@@ -149,7 +149,6 @@ if __name__ == '__main__':
     else:
         script_dir = os.path.dirname(os.path.abspath(__file__))
 
-    icon_path = os.path.join(script_dir, 'icon.icns')
     settings_path = os.path.join(script_dir, 'settings.json')
     with open(settings_path, 'r') as file:
         settings = json.load(file)
@@ -158,18 +157,15 @@ if __name__ == '__main__':
     server = 'https://emood.pythonanywhere.com/'
     detection_time = settings['detection_time']
 
-    app = eMoodApp(icon_path)
+    app = eMoodApp()
 
     # Create detect_emotion and send_moods_to_server_thread threads
-    detect_emotion_thread = threading.Thread(target=detect_emotion, args=(user_id, detection_time, icon_path))
+    detect_emotion_thread = threading.Thread(target=detect_emotion, args=(user_id, detection_time))
     detect_emotion_thread.start()
 
     server_communication_thread = threading.Thread(target=send_moods_to_server_thread, args=(server,))
     server_communication_thread.start()
 
-    # Run the app on the main thread
+    # Run the app using rumps
     app.run()
 
-    # Wait for the threads to complete if needed
-    detect_emotion_thread.join()
-    server_communication_thread.join()
