@@ -278,8 +278,6 @@ def add_person():
 
         data = json.dumps({"userId": user_id, "detection_time": int(monitor_time)})
         zipf.writestr(f"eMood_detector/settings.json", data.encode('utf-8'))
-        os.chmod(os.path.join('eMood_detector', 'app'),
-                 stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
     zip_buffer.seek(0)
     monitored_users.insert_one({"userId": user_id, "creator": creator, "name": name, "active": None})
