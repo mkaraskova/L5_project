@@ -4,6 +4,7 @@ import json
 import uuid
 from flask import send_file
 from flask import jsonify
+import stat
 from flask_wtf.csrf import generate_csrf
 import bson
 import requests
@@ -245,7 +246,7 @@ def add_person():
         exe_url = 'https://www.dropbox.com/scl/fi/spohmcustw96cp3drse2t/app.exe?rlkey=rrr8aqvk3ya0bceqfkrk4u79e&dl=1'
     elif platform == 'macOS':
         detector_path = 'eMood_detector/macos_app'
-        exe_url = 'https://www.dropbox.com/scl/fi/t0qyw5gy15sum8bwxg09u/app_mac?rlkey=he27w5xe2lebuj199qap2ifl7&dl=1'
+        exe_url = 'https://www.dropbox.com/scl/fi/2jy98fx26b7xphiwyq41w/app_mac?rlkey=pi0xzw92fyvfcehakb6uhlzh4&dl=1'
 
     # Create a BytesIO object to hold the ZIP file in memory
     zip_buffer = io.BytesIO()
@@ -277,6 +278,8 @@ def add_person():
 
         data = json.dumps({"userId": user_id, "detection_time": int(monitor_time)})
         zipf.writestr(f"eMood_detector/settings.json", data.encode('utf-8'))
+        os.chmod(os.path.join('eMood_detector', 'app'),
+                 stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
     zip_buffer.seek(0)
     monitored_users.insert_one({"userId": user_id, "creator": creator, "name": name, "active": None})
