@@ -41,7 +41,7 @@ def send_notification(message, title):
 
 class eMoodApp(rumps.App):
     def __init__(self):
-        super(eMoodApp, self).__init__("eMood", icon='icon.png')
+        super(eMoodApp, self).__init__("eMood", icon=resource_path('icon.png'))
         self.menu = ["Stop Mood Monitoring"]
 
     @rumps.clicked("Stop Mood Monitoring")
@@ -141,6 +141,11 @@ def detect_emotion(user_id, detection_time):
         frame_no += 1
 
     webcam.release()
+
+
+def resource_path(relative_path):
+    base_path = getattr(sys, '_MEIPASS', os.path.dirname(os.path.abspath(__file__)))
+    return os.path.join(base_path, relative_path)
 
 
 if __name__ == '__main__':
